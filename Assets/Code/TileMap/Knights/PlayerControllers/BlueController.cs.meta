@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 6fa8ed5f532f0de4e821b7f8b7b0b870
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - respawnSprite: {fileID: 21300000, guid: fa9fe1eedbdf24f8d95837bfdb2af885, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
