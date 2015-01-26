@@ -23,6 +23,7 @@ public class Tile : MonoBehaviour
 		private Vector3 destroySize = new Vector3 (0.00001f, 0.00001f, 0.00001f);
 		private bool isInPlayerHand = false;
 		private bool isUpToDate = false;
+		public int slotIndex = -1;
 
 		public enum TileType
 		{
@@ -215,8 +216,8 @@ public class Tile : MonoBehaviour
 	
 		public void shiftRight ()
 		{
-				Vector3 position = gameObject.transform.position;	
-				endPosition = new Vector3 (position.x + TileMap.tileSize, position.y, position.z);
+				startPosition = gameObject.transform.position;	
+				endPosition = new Vector3 (startPosition.x + TileMap.tileSize, startPosition.y, startPosition.z);
 				this.coordinate = new Vector2 (coordinate.x + 1, coordinate.y);	
 				flag = true;
 
@@ -233,8 +234,8 @@ public class Tile : MonoBehaviour
 		public void shiftDown ()
 		{
 
-				Vector3 position = gameObject.transform.position;
-				endPosition = new Vector3 (position.x, position.y - TileMap.tileSize, position.z);
+				startPosition = gameObject.transform.position;
+				endPosition = new Vector3 (startPosition.x, startPosition.y - TileMap.tileSize, startPosition.z);
 				this.coordinate = new Vector2 (coordinate.x, coordinate.y - 1);	
 				flag = true;
 		
@@ -242,8 +243,8 @@ public class Tile : MonoBehaviour
 	
 		public void shiftUp ()
 		{
-				Vector3 position = gameObject.transform.position;
-				endPosition = new Vector3 (position.x, position.y + TileMap.tileSize, position.z);
+				startPosition = gameObject.transform.position;
+				endPosition = new Vector3 (startPosition.x, startPosition.y + TileMap.tileSize, startPosition.z);
 				this.coordinate = new Vector2 (coordinate.x, coordinate.y + 1);	
 				flag = true;		
 		}
@@ -279,10 +280,21 @@ public class Tile : MonoBehaviour
 				if (destroying && !Mathf.Approximately (gameObject.transform.localScale.magnitude, destroySize.magnitude)) {
 						ShrinkTile ();
 				} else if (destroying && Mathf.Approximately (gameObject.transform.localScale.magnitude, destroySize.magnitude)) {
-						Destroy (this.gameObject);
+						PutTileInSlot ();
+						
 			
 				}
 		}
+
+		void PutTileInSlot ()
+		{
+				PlayerDeck deck = GameObject.FindObjectOfType<PlayerDeck> ();				
+				deck.PutTileInSlot (this.gameObject, slotIndex);
+				this.transform.localScale = new Vector3 (0.5f, 0.5f, 1f);
+				destroying = false;
+				setToDestroy = false;
+		}
+
 
 		public void UpdateTileRefs ()
 		{
@@ -298,6 +310,11 @@ public class Tile : MonoBehaviour
 						destroying = true;
 				}
 
+		}
+
+		public bool isAt (Vector2 coordinate)
+		{
+				return this.coordinate == coordinate;
 		}
 
 		void ShrinkTile ()

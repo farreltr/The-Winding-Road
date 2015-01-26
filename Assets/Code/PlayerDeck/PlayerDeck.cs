@@ -8,7 +8,7 @@ public class PlayerDeck : MonoBehaviour
 		public static DeckTile selectedTile;
 		private DeckTile[] slots;
 		private int numberOfSlots = 3;
-		private Vector2[] position = {new Vector2 (6.85f, 4.05f), new Vector2 (6.85f, 1.8f), new Vector2 (6.85f, -0.45f)};
+		private Vector2[] slotPosition = {new Vector2 (6.85f, 4.05f), new Vector2 (6.85f, 1.8f), new Vector2 (6.85f, -0.45f)};
 
 		void Start ()
 		{
@@ -48,16 +48,7 @@ public class PlayerDeck : MonoBehaviour
 						GameObject randomTile = tiles [Random.Range (0, tiles.Length)];
 						randomTile.transform.rotation = SetUpRandomRotation ();
 						GameObject slot = Instantiate (randomTile) as GameObject;
-						//slot.transform.localScale = new Vector3 (1f, 1f, 1f);
-						slot.transform.position = position [i];
-						slot.transform.GetComponent<SpriteRenderer> ().sortingLayerName = "Deck Tile";
-						slot.layer = 11;
-						DeckTile deckTile = slot.GetComponent<DeckTile> ();
-						if (deckTile == null) {
-								deckTile = slot.AddComponent<DeckTile> ();
-						}
-						slots [i] = deckTile;
-						slot.transform.parent = this.transform;
+						PutTileInSlot (slot, i);
 				}
 
 		}
@@ -68,6 +59,23 @@ public class PlayerDeck : MonoBehaviour
 				float randomZRotation = 90f * Random.Range (0, 4);
 				randomRotation.z = randomZRotation;
 				return Quaternion.Euler (randomRotation);
+
+		}
+
+		public void PutTileInSlot (GameObject slot, int i)
+		{
+				slot.transform.position = slotPosition [i];
+				slot.transform.GetComponent<SpriteRenderer> ().sortingLayerName = "Deck Tile";
+				slot.layer = 11;
+				DeckTile deckTile = slot.GetComponent<DeckTile> ();
+				if (deckTile == null) {
+						deckTile = slot.AddComponent<DeckTile> ();
+				}
+				slots [i] = deckTile;
+				deckTile.SetSlotPosition (slotPosition [i]);
+				deckTile.SetSlotIndex (i);
+				deckTile.GetComponent<Tile> ().slotIndex = i;
+				slot.transform.parent = this.transform;
 
 		}
 }

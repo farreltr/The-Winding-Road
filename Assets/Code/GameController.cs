@@ -3,7 +3,7 @@ using System.Collections;
 
 public class GameController : MonoBehaviour
 {
-		private PlayerDeck playerDeck;
+		private PlayerDeck deck;
 		private bool restart;
 		private bool gameOver;
 		public int numberOfPLayers = 1;
@@ -23,13 +23,14 @@ public class GameController : MonoBehaviour
 		private bool isDragging = false;
 		private DeckTile draggingTile;
 		private Tile endTile;
+		private int draggingTileIndex;
 
 		void Start ()
 		{
 				DontDestroyOnLoad (gameObject);
 				gameOver = false;
 				restart = false;
-				playerDeck = GameObject.FindObjectOfType<PlayerDeck> ();
+				deck = GameObject.FindObjectOfType<PlayerDeck> ();
 
 		}
 	
@@ -38,11 +39,12 @@ public class GameController : MonoBehaviour
 
 				if (isDragging && draggingTile.IsHit ()) {
 						draggingTile.transform.parent = GameObject.FindObjectOfType<Board> ().transform;
-						draggingTile.gameObject.GetComponent<Tile> ().coordinate = new Vector2 (currentCoordinateX, currentCoordinateY);
+						draggingTile.gameObject.GetComponent<Tile> ().coordinate = new Vector2 (currentCoordinateX - 1, currentCoordinateY - 1);
 						bool done = HandleTile ();	
 						if (done) {
 								isDragging = false;
 								DeckTile draggable = draggingTile.GetComponent<DeckTile> ();
+								draggingTileIndex = draggable.GetSlotIndex ();
 								if (draggable != null) {
 										draggable.enabled = false;
 										Tile tile = draggable.gameObject.GetComponent<Tile> ();
@@ -128,6 +130,7 @@ public class GameController : MonoBehaviour
 
 		private void EndTileFall ()
 		{
+				endTile.slotIndex = draggingTile.GetSlotIndex ();
 				endTile.setToDestroy = true;
 				endTile = null;
 		}
@@ -268,12 +271,14 @@ public class GameController : MonoBehaviour
 		{
 				switch (direction) {
 				case Direction.RIGHT:
-						for (int x=TileMap.size_x - 2; x>0; x--) {
-								Tile tile = GetTileAtCoordinate (new Vector2 (x, currentCoordinateY));
+						bool isFirstRight = true;
+						for (int x=boardSizeX - 1; x>-1; x--) {
+								Tile tile = GetTileAtCoordinate (new Vector2 (x, currentCoordinateY - 1));
 								if (tile != null) {
 										tile.shiftRight ();
-										if (x == TileMap.size_x - 2) {
+										if (isFirstRight) {
 												endTile = tile;
+												isFirstRight = false;
 										}
 								}
 								
@@ -281,36 +286,42 @@ public class GameController : MonoBehaviour
 						draggingTile.GetComponent<Tile> ().shiftRight ();
 						break;
 				case Direction.LEFT: 
-						for (int x=0; x<TileMap.size_x; x++) {
-								Tile tile = GetTileAtCoordinate (new Vector2 (x, currentCoordinateY));
+						bool isFirstLeft = true;
+						for (int x=0; x<boardSizeX; x++) {
+								Tile tile = GetTileAtCoordinate (new Vector2 (x, currentCoordinateY - 1));
 								if (tile != null) {
 										tile.shiftLeft ();
-										if (x == 0) {
+										if (isFirstLeft) {
 												endTile = tile;
+												isFirstLeft = false;
 										}
 								}
 						}
 						draggingTile.GetComponent<Tile> ().shiftLeft ();
 						break;
 				case Direction.DOWN:
-						for (int y=0; y<TileMap.size_y; y++) {
-								Tile tile = GetTileAtCoordinate (new Vector2 (currentCoordinateX, y));
+						bool isFirstDown = true;
+						for (int y=0; y<boardSizeY; y++) {
+								Tile tile = GetTileAtCoordinate (new Vector2 (currentCoordinateX - 1, y));
 								if (tile != null) {
 										tile.shiftDown ();
-										if (y == 0) {
+										if (isFirstDown) {
 												endTile = tile;
+												isFirstDown = false;
 										}
 								}			
 						}
 						draggingTile.GetComponent<Tile> ().shiftDown ();
 						break;								
 				case Direction.UP:
-						for (int y=TileMap.size_y - 2; y>0; y--) {	
-								Tile tile = GetTileAtCoordinate (new Vector2 (currentCoordinateX, y));
+						bool isFirstUp = true;
+						for (int y=boardSizeY - 1; y>-1; y--) {	
+								Tile tile = GetTileAtCoordinate (new Vector2 (currentCoordinateX - 1, y));
 								if (tile != null) {
 										tile.shiftUp ();	
-										if (y == TileMap.size_y - 2) {
+										if (isFirstUp) {
 												endTile = tile;
+												isFirstUp = false;
 										}
 								}							
 						}
@@ -321,11 +332,11 @@ public class GameController : MonoBehaviour
 
 		public Tile GetTileAtCoordinate (Vector2 coordinate)
 		{
-				Vector3 position = new Vector3 (1.7f + (TileMap.tileSize * coordinate.x), 1.7f + (TileMap.tileSize * coordinate.y), 0.0f);
 				GameObject[] boardTiles = GameObject.FindGameObjectsWithTag ("Board");
 				foreach (GameObject boardTile in boardTiles) {
-						if ((boardTile.transform.localPosition - position).magnitude < 2) {
-								return boardTile.GetComponent<Tile> ();
+						Tile tile = boardTile.GetComponent<Tile> ();
+						if (tile != null && tile.isAt (coordinate)) {
+								return tile;
 						}
 				}
 				return null;

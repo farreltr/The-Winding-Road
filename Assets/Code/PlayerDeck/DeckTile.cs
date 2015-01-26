@@ -14,6 +14,7 @@ public class DeckTile : MonoBehaviour
 		private bool released = false;
 		private bool hit = false;
 		private bool draggable = true;
+		private int slotIndex;
 	
 		void Start ()
 		{
@@ -60,7 +61,7 @@ public class DeckTile : MonoBehaviour
 				}
 				SetReleased (true);
 				if (!IsHit ()) {
-						//go back to your original place
+						gameObject.transform.position = slotPosition;
 				}
 		}
 
@@ -124,6 +125,16 @@ public class DeckTile : MonoBehaviour
 		public bool IsHit ()
 		{
 				return hit;
+		}
+
+		public int GetSlotIndex ()
+		{
+				return slotIndex;
+		}
+
+		public void SetSlotIndex (int index)
+		{
+				this.slotIndex = index;
 		}
 
 }
