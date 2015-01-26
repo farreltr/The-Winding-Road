@@ -61,7 +61,9 @@
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\BlueController.cs" />
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\GreenController.cs" />
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\PlayerController.cs" />
+     <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\PlayerControllerNew.cs" />
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\RedController.cs" />
+     <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\RedControllerNew.cs" />
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\YellowController.cs" />
      <Compile Include="Assets\Code\TileMap\TileMap.cs" />
      <Compile Include="Assets\Code\WaitAndClick.cs" />

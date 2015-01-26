@@ -330,7 +330,7 @@ public class GameController : MonoBehaviour
 				}
 		}
 
-		public Tile GetTileAtCoordinate (Vector2 coordinate)
+		public static Tile GetTileAtCoordinate (Vector2 coordinate)
 		{
 				GameObject[] boardTiles = GameObject.FindGameObjectsWithTag ("Board");
 				foreach (GameObject boardTile in boardTiles) {

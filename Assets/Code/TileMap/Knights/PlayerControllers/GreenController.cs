@@ -41,7 +41,7 @@ public class GreenController : PlayerController
 
 		public override bool canMove ()
 		{	
-				Tile startBlock = GetTileAtCoordinate (startTileCoordinate);
+				Tile startBlock = GameController.GetTileAtCoordinate (startTileCoordinate);
 				if (startBlock == null)
 						return false;
 				float rotation = startBlock.transform.rotation.eulerAngles.z;

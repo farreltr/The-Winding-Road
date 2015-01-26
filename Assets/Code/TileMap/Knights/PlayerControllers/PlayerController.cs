@@ -255,7 +255,7 @@ public abstract class PlayerController : MonoBehaviour
 				return (Mathf.FloorToInt (pos / TileMap.tileSize));
 		}
 
-		public Tile GetTileAtCoordinate (Vector2 coordinate)
+		/*public Tile GetTileAtCoordinate (Vector2 coordinate)
 		{
 				Vector3 position = new Vector3 (TileMap.tileSize * (0.5f + coordinate.x), TileMap.tileSize * (0.5f + coordinate.y), 0.0f);
 				GameObject[] boardTiles = GameObject.FindGameObjectsWithTag ("Board Tile");
@@ -265,7 +265,7 @@ public abstract class PlayerController : MonoBehaviour
 						}
 				}
 				return null;		
-		}
+		} */
 	
 		void respawn ()
 		{
