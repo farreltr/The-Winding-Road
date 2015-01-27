@@ -11,7 +11,7 @@ public class RedControllerNew : PlayerControllerNew
 		{
 				name = "red";
 				//respawnPosition = new Vector3 (970.0f, 180.0f, 0);
-				startDirection = new Vector2 (-1.0f, 0.0f);
+				startDirection = new Vector2 (0.0f, 1.0f);
 				respawnPosition = this.transform.position;
 				this.respawnSprite = gameObject.GetComponent<SpriteRenderer> ().sprite;
 				base.Start ();
