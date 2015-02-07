@@ -4,11 +4,11 @@ using System.Collections;
 
 public class PlayerDeck : MonoBehaviour
 {
-
 		public static DeckTile selectedTile;
 		private DeckTile[] slots;
 		private int numberOfSlots = 3;
 		private Vector2[] slotPosition = {new Vector2 (6.85f, 4.05f), new Vector2 (6.85f, 1.8f), new Vector2 (6.85f, -0.45f)};
+		public Transform rotateButton;
 
 		void Start ()
 		{
@@ -20,14 +20,7 @@ public class PlayerDeck : MonoBehaviour
 
 		public void SetSelected (DeckTile select)
 		{
-				{
-						if (selectedTile != null) {
-								selectedTile.SetNotSelectedColour ();	
-								selectedTile.SetSelectedColour ();
-						}
-						selectedTile = select;
-
-				}
+				selectedTile = select;
 		}
 
 		public DeckTile getSelected ()
@@ -48,8 +41,9 @@ public class PlayerDeck : MonoBehaviour
 						GameObject randomTile = tiles [Random.Range (0, tiles.Length)];
 						randomTile.transform.rotation = SetUpRandomRotation ();
 						GameObject slot = Instantiate (randomTile) as GameObject;
-						PutTileInSlot (slot, i);
+						PutTileInSlot (slot, i);	
 				}
+				AddRotateButtons ();
 
 		}
 
@@ -76,6 +70,21 @@ public class PlayerDeck : MonoBehaviour
 				deckTile.SetSlotIndex (i);
 				deckTile.GetComponent<Tile> ().slotIndex = i;
 				slot.transform.parent = this.transform;
+		}
 
+		void AddRotateButtons ()
+		{
+				for (int i=0; i< numberOfSlots; i++) {
+						Vector3 rotatePosition = new Vector2 (slotPosition [i].x + TileMap.tileSize / 2, slotPosition [i].y - TileMap.tileSize / 2);
+						Transform rotate = Instantiate (rotateButton, rotatePosition, rotateButton.rotation) as Transform;
+						rotate.GetComponent<Rotate> ().index = i;
+						rotate.transform.parent = this.transform;
+				}
+
+		}
+
+		public Tile GetTileFromIndex (int index)
+		{
+				return slots [index].GetComponent<Tile> ();
 		}
 }

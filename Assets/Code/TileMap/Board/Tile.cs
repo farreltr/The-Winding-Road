@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 
 [System.Serializable]
@@ -24,6 +25,9 @@ public class Tile : MonoBehaviour
 		private bool isInPlayerHand = false;
 		private bool isUpToDate = false;
 		public int slotIndex = -1;
+		private Vector3[] wayPoints = new Vector3[9];
+		public static float RADIUS = TileMap.tileSize / 2.0f;
+
 
 		public enum TileType
 		{
@@ -37,7 +41,8 @@ public class Tile : MonoBehaviour
 
 		public void Start ()
 		{
-				endPosition = gameObject.transform.position;				
+				endPosition = gameObject.transform.position;	
+				SetUpWayPoints ();
 		}
 
 		public static TileType getTileType (string tileString)
@@ -58,6 +63,24 @@ public class Tile : MonoBehaviour
 				}
 		}
 
+		private void SetUpWayPoints ()
+		{
+				float x = transform.position.x;
+				float y = transform.position.y;
+				float z = transform.position.z;
+				wayPoints [0] = transform.position;
+
+				wayPoints [1] = new Vector3 (x - RADIUS, y, z);
+				wayPoints [2] = new Vector3 (x, y + RADIUS, z);
+				wayPoints [3] = new Vector3 (x + RADIUS, y, z);
+				wayPoints [4] = new Vector3 (x, y - RADIUS, z);
+
+				//wayPoints [5] = new Vector3 (x, y + RADIUS / 2f, z);
+				//wayPoints [6] = new Vector3 (x + RADIUS / 2f, y, z);
+				//wayPoints [7] = new Vector3 (x, y - RADIUS / 2f, z);
+				//wayPoints [8] = new Vector3 (x + RADIUS / 2f, y, z);
+		}
+
 		public static string getTileString (TileType tileType)
 		{
 				switch (tileType) {
@@ -74,6 +97,198 @@ public class Tile : MonoBehaviour
 				default :
 						return "";
 				}
+		}
+
+		public int GetPointForPosition (Vector3 position)
+		{
+				int returnValue = 0;
+				float distance = 100f;
+				int i = 0;
+				foreach (Vector3 awp in GetActiveWayPoints ()) {
+						float d = Vector3.Distance (position, awp);
+						if (d < distance) {
+								distance = d;
+								returnValue = i;
+						}
+						i++;
+				}
+				return i;
+		}
+
+		public Vector3[] GetActiveWayPoints ()
+		{
+				List<Vector3> returnWayPoints = new List<Vector3> ();
+				int rotation = GetIntegerRotation ();
+				switch (this.type) {
+				case TileType.Block:
+						{
+								break;
+						}
+				case TileType.CrossJunction:
+						{
+								returnWayPoints.Add (wayPoints [0]);
+								returnWayPoints.Add (wayPoints [1]);
+								returnWayPoints.Add (wayPoints [2]);
+								returnWayPoints.Add (wayPoints [3]);
+								returnWayPoints.Add (wayPoints [4]);
+								returnWayPoints.Add (wayPoints [5]);
+								returnWayPoints.Add (wayPoints [6]);
+								returnWayPoints.Add (wayPoints [7]);
+								returnWayPoints.Add (wayPoints [8]);
+								break;
+						}
+				case TileType.TJunction:
+						{
+								switch (rotation) {
+								case 0:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [2]);
+												returnWayPoints.Add (wayPoints [3]);
+												returnWayPoints.Add (wayPoints [4]);
+												returnWayPoints.Add (wayPoints [5]);
+												returnWayPoints.Add (wayPoints [6]);
+												returnWayPoints.Add (wayPoints [7]);
+												break;
+
+										}
+								case 90:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [1]);
+												returnWayPoints.Add (wayPoints [2]);
+												returnWayPoints.Add (wayPoints [3]);
+												returnWayPoints.Add (wayPoints [5]);
+												returnWayPoints.Add (wayPoints [6]);
+												returnWayPoints.Add (wayPoints [8]);
+												break;
+
+										}
+								case 180:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [1]);
+												returnWayPoints.Add (wayPoints [2]);
+												returnWayPoints.Add (wayPoints [4]);
+												returnWayPoints.Add (wayPoints [8]);
+												returnWayPoints.Add (wayPoints [5]);
+												returnWayPoints.Add (wayPoints [7]);
+												break;
+										}
+								case 270:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [1]);
+												returnWayPoints.Add (wayPoints [3]);
+												returnWayPoints.Add (wayPoints [4]);
+												returnWayPoints.Add (wayPoints [8]);
+												returnWayPoints.Add (wayPoints [6]);
+												returnWayPoints.Add (wayPoints [7]);
+												break;
+										}
+								}
+
+								break;
+						}
+				case TileType.Curve:
+						{
+								switch (rotation) {
+								case 0:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [2]);
+												returnWayPoints.Add (wayPoints [3]);
+												returnWayPoints.Add (wayPoints [5]);
+												returnWayPoints.Add (wayPoints [6]);
+												break;
+				
+										}
+								case 90:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [1]);
+												returnWayPoints.Add (wayPoints [2]);
+												returnWayPoints.Add (wayPoints [8]);
+												returnWayPoints.Add (wayPoints [5]);
+												break;
+				
+										}
+								case 180:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [1]);
+												returnWayPoints.Add (wayPoints [4]);
+												returnWayPoints.Add (wayPoints [8]);
+												returnWayPoints.Add (wayPoints [7]);
+												break;
+										}
+								case 270:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [3]);
+												returnWayPoints.Add (wayPoints [4]);
+												returnWayPoints.Add (wayPoints [6]);
+												returnWayPoints.Add (wayPoints [7]);
+												break;
+										}
+								}
+			
+								break;
+						}
+				case  TileType.Straight:
+						{
+								switch (rotation) {
+								case 0:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [2]);
+												returnWayPoints.Add (wayPoints [4]);
+												returnWayPoints.Add (wayPoints [5]);
+												returnWayPoints.Add (wayPoints [7]);
+												break;
+				
+										}
+								case 90:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [1]);
+												returnWayPoints.Add (wayPoints [3]);
+												returnWayPoints.Add (wayPoints [8]);
+												returnWayPoints.Add (wayPoints [6]);
+												break;
+				
+										}
+								case 180:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [2]);
+												returnWayPoints.Add (wayPoints [4]);
+												returnWayPoints.Add (wayPoints [5]);
+												returnWayPoints.Add (wayPoints [7]);
+												break;
+										}
+								case 270:
+										{
+												returnWayPoints.Add (wayPoints [0]);
+												returnWayPoints.Add (wayPoints [1]);
+												returnWayPoints.Add (wayPoints [3]);
+												returnWayPoints.Add (wayPoints [8]);
+												returnWayPoints.Add (wayPoints [6]);
+												break;
+										}
+								}
+			
+								break;
+						}
+				default :
+						break;
+				}
+				return returnWayPoints.ToArray ();
+		}
+
+		int GetIntegerRotation ()
+		{
+				return Mathf.FloorToInt (transform.rotation.eulerAngles.z);
 		}
 
 		public bool isEmpty ()
@@ -340,6 +555,11 @@ public class Tile : MonoBehaviour
 				}
 				return false;
 		
+		}
+
+		void OnCollisionEnter2D (Collision2D collision)
+		{
+
 		}
 
 		void OnSerializeNetworkView (BitStream stream, NetworkMessageInfo info)

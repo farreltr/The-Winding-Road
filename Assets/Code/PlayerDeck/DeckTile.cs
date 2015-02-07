@@ -15,6 +15,7 @@ public class DeckTile : MonoBehaviour
 		private bool hit = false;
 		private bool draggable = true;
 		private int slotIndex;
+		private Transform child;
 	
 		void Start ()
 		{
@@ -75,16 +76,6 @@ public class DeckTile : MonoBehaviour
 				}
 		}  
 
-		public void SetSelectedColour ()
-		{
-				gameObject.renderer.material.color = transparentColour;
-		}
-
-		public void SetNotSelectedColour ()
-		{
-				gameObject.renderer.material.color = originalColour;
-		}
-
 		public Vector3 GetSlotPosition ()
 		{
 				return slotPosition;
@@ -100,6 +91,7 @@ public class DeckTile : MonoBehaviour
 				gameController.SetDragging (dragging);
 				if (dragging) {
 						gameController.SetDraggingTile (this);
+						this.transform.DetachChildren ();
 				} else {
 						gameController.SetDraggingTile (null);
 				}

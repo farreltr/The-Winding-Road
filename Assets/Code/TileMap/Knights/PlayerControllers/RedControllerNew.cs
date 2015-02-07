@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RedControllerNew : PlayerControllerNew
+public class RedControllerNew : PlayerController
 {
 
 		Vector2 startTileCoordinate = new Vector2 (TileMap.size_x - 2, 1.0f);

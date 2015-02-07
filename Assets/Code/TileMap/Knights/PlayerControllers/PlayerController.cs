@@ -58,7 +58,8 @@ public abstract class PlayerController : MonoBehaviour
 						animator.enabled = true;
 				}
 				if (!isRespawn && isOutOfBounds) {
-						ChangeDirection ();
+						//ChangeDirection ();
+						//MoveIntoBounds ();
 				}
 				if (!isOutOfBounds && !isTileMoving ()) {
 						isRespawn = false;
@@ -111,19 +112,28 @@ public abstract class PlayerController : MonoBehaviour
 
 		void OnCollisionEnter2D (Collision2D collision)
 		{
-				if (!isRespawn) {
-						ChangeDirection ();
-						PlayerController collisionController = collision.gameObject.GetComponent<PlayerController> ();
-						if (collisionController != null) {
-								collisionController.ChangeDirection ();
+				if (!isRespawn && !IsMe (collision.collider.collider2D)) {
+						if (collision.collider.collider2D is BoxCollider2D) {
+								ChangeDirection ();
+								PlayerController collisionController = collision.gameObject.GetComponent<PlayerController> ();
+								if (collisionController != null) {
+										collisionController.ChangeDirection ();
+								}
+
 						}
+
 				}
 
 		}
 
+		bool IsMe (Collider2D collider)
+		{
+				return collider == this.collider2D;
+		}
+
 		public void ChangeDirection ()
 		{
-				if (direction == RIGHT) {
+				/*if (direction == RIGHT) {
 						direction = LEFT;
 				} else if (direction == LEFT) {
 						direction = RIGHT;
@@ -131,8 +141,9 @@ public abstract class PlayerController : MonoBehaviour
 						direction = DOWN;
 				} else if (direction == DOWN) {
 						direction = UP;
-				}		
-				transform.Translate (direction);
+				}	*/
+				direction = -1 * direction;
+				//transform.Translate (direction);
 		}
 	
 	
@@ -147,6 +158,25 @@ public abstract class PlayerController : MonoBehaviour
 				}
 				return false;
 		
+		}
+
+		void MoveIntoBounds ()
+		{
+				Vector3 myPosition = transform.position;
+				if (transform.position.x < minX) {
+						myPosition.x += 0.01f;
+				}
+				if (transform.position.x > maxX) {
+						myPosition.x -= 0.01f;
+				}
+		
+				if (transform.position.y < minY) {
+						myPosition.y += 0.01f;
+				}
+				if (transform.position.y > maxY) {
+						myPosition.y -= 0.01f;
+				}
+				transform.Translate (myPosition);
 		}
 
 		public abstract string GetName ();
@@ -169,7 +199,7 @@ public abstract class PlayerController : MonoBehaviour
 				} else if (direction == DOWN) {
 						direction = LEFT;
 				}		
-				transform.Translate (direction);
+				//transform.Translate (direction);
 		}
 
 		public void Turn45Right ()
@@ -191,7 +221,7 @@ public abstract class PlayerController : MonoBehaviour
 				} else if (direction == LEFT_UP) {
 						direction = UP;
 				}
-				transform.Translate (direction);
+				//transform.Translate (direction);
 		}
 
 		public void TurnLeft ()
@@ -205,7 +235,7 @@ public abstract class PlayerController : MonoBehaviour
 				} else if (direction == DOWN) {
 						direction = RIGHT;
 				}		
-				transform.Translate (direction);
+				//transform.Translate (direction);
 		
 		}
 
@@ -229,7 +259,7 @@ public abstract class PlayerController : MonoBehaviour
 				} else if (direction == LEFT_UP) {
 						direction = LEFT;
 				}
-				transform.Translate (direction);
+				//transform.Translate (direction);
 		
 		}
 

@@ -1,7 +1,8 @@
 fileFormatVersion: 2
 guid: d90dabae8a8ed420d916de1c14128231
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: portrait_GREEN_on
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0

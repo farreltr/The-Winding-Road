@@ -125,7 +125,16 @@ public class GameController : MonoBehaviour
 				ShiftBoardTiles ();
 				ShiftPlayers ();
 				EndTileFall ();
+				TriggerMoveEvent ();
 				return true;
+		}
+
+		void TriggerMoveEvent ()
+		{
+				PlayerController[] knights = GameObject.FindObjectsOfType<PlayerController> ();
+				foreach (PlayerController knight in knights) {
+						//knight.isTriggerAction = true;
+				}
 		}
 
 		private void EndTileFall ()
