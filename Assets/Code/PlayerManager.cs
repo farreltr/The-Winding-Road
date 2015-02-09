@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using System;
 
@@ -14,7 +14,7 @@ public class PlayerManager : MonoBehaviour
 		public GUISkin skin;
 		private List<Player> players = new List<Player> ();
 		private List<int> list = new List<int> ();
-		public Player currentPlayer;
+		public static Player currentPlayer;
 		public int currentPlayerIdx = 0;
 		public GameController controller;
 		public bool showCharSelect = true;
@@ -24,7 +24,6 @@ public class PlayerManager : MonoBehaviour
 		public int yellowWins = 0;
 		private float nameBoxWidth = 120.0f;
 		private float nameBoxHeight = 20.0f;
-
 
 		public static PlayerManager playerManager;
 	
@@ -142,14 +141,16 @@ public class PlayerManager : MonoBehaviour
 		{
 				showCharSelect = false;
 				players.Sort ();
-				currentPlayer = players [currentPlayerIdx];	
+				currentPlayer = players [currentPlayerIdx];
 				SetUpPlayerPrefs ();
-				//Application.LoadLevel (currentPlayer.getPlayerColour ().ToString ());		
-				Instantiate (controller);
+				Application.LoadLevel (currentPlayer.getPlayerColour ().ToString ());
+				GameController c = Instantiate (controller) as GameController;
+				UpdatePortraits ();
 		}
 
 		public void LoadNextLevel ()
 		{
+				SaveLevel ();
 				currentPlayerIdx++;
 				if (currentPlayerIdx == players.Count) {
 						currentPlayerIdx = 0;
@@ -159,7 +160,9 @@ public class PlayerManager : MonoBehaviour
 //				if (inventory) {
 //						inventory.Save ();
 //				}
-//				Application.LoadLevel (currentPlayer.getPlayerColour ().ToString ());
+				Application.LoadLevel (currentPlayer.getPlayerColour ().ToString ());
+				UpdatePortraits ();
+				print (currentPlayer.getPlayerColour ().ToString ());
 		}
 
 		public Player GetPlayerByName (string name)
@@ -188,6 +191,10 @@ public class PlayerManager : MonoBehaviour
 		public void OnLevelWasLoaded (int i)
 		{
 				print (Application.loadedLevelName);
+				if (Application.loadedLevelName != "Character Select") {
+						LoadLevel ();
+				}
+				
 		}
 	
 		public void WinScreen (string winner)
@@ -214,19 +221,91 @@ public class PlayerManager : MonoBehaviour
 
 		void SetUpPlayerPrefs ()
 		{
-				PlayerPrefs.SetString ("red", GenerateRandomTiles ());
-				PlayerPrefs.SetString ("yellow", GenerateRandomTiles ());
-				PlayerPrefs.SetString ("blue", GenerateRandomTiles ());
-				PlayerPrefs.SetString ("green", GenerateRandomTiles ());
+				PlayerPrefs.SetString ("RED", GenerateRandomTiles ());
+				PlayerPrefs.SetString ("YELLOW", GenerateRandomTiles ());
+				PlayerPrefs.SetString ("BLUE", GenerateRandomTiles ());
+				PlayerPrefs.SetString ("GREEN", GenerateRandomTiles ());
 		}
 
 		string GenerateRandomTiles ()
 		{
 				string randomTiles = "";
 				for (int i=0; i<3; i++) {
-						randomTiles += Tile.getRandomTypeString () + ":" + Tile.GetRandomRotation ();
+						randomTiles += Tile.getRandomTypeString () + ":" + Tile.GetRandomRotation () + ":" + i.ToString ();
 						randomTiles += "/";
 				}
 				return randomTiles;
+		}
+
+	
+		void SaveLevel ()
+		{
+				string playerColour = currentPlayer.getPlayerColour ().ToString ();
+				string playerHandString = "";
+				foreach (DeckTile tile in GameObject.FindObjectsOfType<DeckTile>()) {
+						//Tile tile = deckTile.GetComponent<Tile> ();
+						if (tile != null) {
+								playerHandString += tile.Serialize ();
+								playerHandString += "/";
+								Destroy (tile.gameObject);
+						}
+				}
+				PlayerPrefs.SetString (playerColour, playerHandString);
+
+		} 
+	
+		public void LoadLevel ()
+		{
+				string playerColor = currentPlayer.getPlayerColour ().ToString ();
+				string[] tileStrings = PlayerPrefs.GetString (playerColor).Split ('/');
+				if (tileStrings == null || tileStrings.Length < PlayerDeck.numberOfSlots) {
+						tileStrings = new string[PlayerDeck.numberOfSlots];
+				}
+				PlayerDeck deck = GameObject.FindGameObjectWithTag (playerColor + "_deck").GetComponent<PlayerDeck> ();
+				if (deck != null) {
+						GameObject[] currentPlayerDeck = new GameObject[PlayerDeck.numberOfSlots];
+						if (tileStrings != null) {
+								for (int i=0; i<PlayerDeck.numberOfSlots; i++) {
+										DeckTile dt = DeckTile.Deserialize (tileStrings [i]);
+										currentPlayerDeck [dt.GetSlotIndex ()] = dt.gameObject;
+								}
+								deck.SetUpSpecificSlots (currentPlayerDeck);
+				
+						} else {
+								deck.SetUpRandomSlots ();
+						}
+				}
+
+		
+		} 
+
+		void UpdatePortraits ()
+		{
+				string playerColor = currentPlayer.getPlayerColour ().ToString ();
+				GameObject[] portraitsOn = GameObject.FindGameObjectsWithTag ("Portrait on");
+				GameObject[] portraitsOff = GameObject.FindGameObjectsWithTag ("Portrait off");
+				foreach (GameObject portraitOn in portraitsOn) {
+						portraitOn.GetComponent<SpriteRenderer> ().sortingLayerName = "off";
+						if (GetFormattedName (portraitOn).Equals ("portrait_" + playerColor + "_on")) {
+								portraitOn.GetComponent<SpriteRenderer> ().sortingLayerName = "on";
+						}
+				}
+				foreach (GameObject portraitOff in portraitsOff) {
+						portraitOff.GetComponent<SpriteRenderer> ().sortingLayerName = "on";
+						if (GetFormattedName (portraitOff).Equals ("portrait_" + playerColor + "_off")) {
+								portraitOff.GetComponent<SpriteRenderer> ().sortingLayerName = "off";
+						}
+				}
+
+		}
+
+		private static string GetFormattedName (GameObject o)
+		{
+				return o.name.Replace ("(Clone)", "");
+		}
+
+		public static string GetPlayerString ()
+		{
+				return currentPlayer.getPlayerColour ().ToString ();
 		}
 }

@@ -55,9 +55,7 @@ public class GameController : MonoBehaviour
 										Destroy (draggable);
 								}
 								print ("done");
-								//SaveLevel ();
-								//PlayerManager.playerManager.LoadNextLevel ();	
-								//LoadLevel ();
+								StartCoroutine ("Wait", 3);
 						}
 
 				} 
@@ -140,6 +138,7 @@ public class GameController : MonoBehaviour
 		private void EndTileFall ()
 		{
 				endTile.slotIndex = draggingTile.GetSlotIndex ();
+				endTile.slotPosition = PlayerDeck.slotPosition [draggingTile.GetSlotIndex ()];
 				endTile.setToDestroy = true;
 				endTile = null;
 		}
@@ -175,19 +174,19 @@ public class GameController : MonoBehaviour
 						}
 				
 				}
-				StartCoroutine ("Wait");
+				StartCoroutine ("Wait", 3);
 
 
 		}
 	
-		IEnumerator Wait ()
+		IEnumerator Wait (int secs)
 		{
-				yield return new WaitForSeconds (3);
-				HandleTile ();	
-				isCPU = false;
+				yield return new WaitForSeconds (secs);
+				//HandleTile ();	
+				//isCPU = false;
 				//inventory.isCPU = false;
 				//inventory.isCPUStarted = false;
-				SaveLevel ();
+				//PlayerManager.playerManager.LoadNextLevel ();	
 				PlayerManager.playerManager.LoadNextLevel ();	
 		}
 
@@ -413,30 +412,9 @@ public class GameController : MonoBehaviour
 
 		}  
 
-		void SaveLevel ()
-		{
-				string playerColour = Application.loadedLevelName;
-				string playerHandString = "";
-				foreach (Tile tile in currentPlayerDeck) {
-						playerHandString += tile.Serialize ();
-						playerHandString += "/";
-				}
-				PlayerPrefs.SetString (playerColour, playerHandString);
-		} 
-
-		void LoadLevel ()
-		{
-				string playerColor = Application.loadedLevelName;
-				string[] tileStrings = PlayerPrefs.GetString (playerColor).Split ('/');
-				for (int i=0; i<tileStrings.Length; i++) {
-						currentPlayerDeck [i] = Tile.Deserialize (tileStrings [i]);
-				}		
-		} 
-
 		public void OnLevelWasLoaded (int i)
 		{
-				PlayerManager pm = GameObject.FindObjectOfType<PlayerManager> ();
-				isCPU = pm.currentPlayer.isCPU;
+				isCPU = PlayerManager.currentPlayer.isCPU;
 		}
 
 

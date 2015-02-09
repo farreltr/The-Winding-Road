@@ -50,9 +50,9 @@
      <Compile Include="Assets\Code\GameController.cs" />
      <Compile Include="Assets\Code\Player.cs" />
      <Compile Include="Assets\Code\PlayerDeck\DeckTile.cs" />
-     <Compile Include="Assets\Code\PlayerDeck\Inventory.cs" />
      <Compile Include="Assets\Code\PlayerDeck\PlayerDeck.cs" />
      <Compile Include="Assets\Code\PlayerManager.cs" />
+     <Compile Include="Assets\Code\RestartButton.cs" />
      <Compile Include="Assets\Code\Rotate.cs" />
      <Compile Include="Assets\Code\TJunctionCollider.cs" />
      <Compile Include="Assets\Code\TileMap\Arrows\Arrow.cs" />
@@ -70,7 +70,6 @@
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\YellowController.cs" />
      <Compile Include="Assets\Code\TileMap\TileMap.cs" />
      <Compile Include="Assets\Code\WaitAndClick.cs" />
-     <Compile Include="Assets\NavMeshAgentController.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Generic\VersionInformation.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Navmesh2D\NavMesh2D.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Navmesh2D\NavMesh2DBehaviour.cs" />

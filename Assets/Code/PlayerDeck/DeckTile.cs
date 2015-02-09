@@ -23,9 +23,12 @@ public class DeckTile : MonoBehaviour
 				transparentColour = originalColour;
 				transparentColour.a = 0.8f;
 				slotPosition = transform.position;
-				this.transform.parent = GameObject.FindObjectOfType<PlayerDeck> ().transform;
-				this.gameController = GameObject.FindObjectOfType<GameController> ();
-				this.parent = gameObject.GetComponentInParent<PlayerDeck> ();
+				if (GameObject.FindObjectOfType<PlayerDeck> () != null) {
+						this.transform.parent = GameObject.FindObjectOfType<PlayerDeck> ().transform;
+						this.gameController = GameObject.FindObjectOfType<GameController> ();
+						this.parent = gameObject.GetComponentInParent<PlayerDeck> ();
+				}
+				
 		}
 	
 		void OnMouseDrag ()
@@ -35,11 +38,13 @@ public class DeckTile : MonoBehaviour
 						Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
 						transform.position = curPosition;
 						SetDragging (true);
+						gameObject.transform.localScale = Vector3.one / 2f * 1.1f;
 				}
 		}
 
 		void OnMouseUp ()
 		{
+				gameObject.transform.localScale = Vector3.one / 2f;
 				float radius = this.transform.localScale.x / 2;
 				Vector2 point = new Vector2 ();
 				point.x = this.transform.position.x + radius;
@@ -127,6 +132,38 @@ public class DeckTile : MonoBehaviour
 		public void SetSlotIndex (int index)
 		{
 				this.slotIndex = index;
+		}
+
+	
+		public string Serialize ()
+		{
+				int rot = Mathf.FloorToInt (gameObject.transform.rotation.eulerAngles.z);
+				Tile tile = gameObject.GetComponent<Tile> ();
+				return Tile.getTileString (tile.type) + ":" + rot + ":" + slotIndex;
+		}
+	
+		public static DeckTile Deserialize (string tileString)
+		{
+				GameObject tile = null;
+				DeckTile dt = null;
+				if (tileString != null) {
+						string[] split = tileString.Split (':');
+						tile = Resources.Load<GameObject> ("Tiles/" + split [0]);
+						if (tile == null) {
+								GameObject[] tilePrefabs = Resources.LoadAll<GameObject> ("Tiles/");
+								GameObject tilePrefab = tilePrefabs [Random.Range (0, tilePrefabs.Length)];
+								tile = Instantiate (tilePrefab) as GameObject;
+								tile.transform.rotation = PlayerDeck.GetUpRandomRotation ();
+				
+						} else {
+								tile = Instantiate (tile) as GameObject;
+								tile.transform.rotation = Tile.GetQuaternion (int.Parse (split [1]));
+						}
+						dt = tile.AddComponent<DeckTile> ();
+						dt.SetSlotIndex (int.Parse (split [2]));
+				}
+
+				return dt;
 		}
 
 }

@@ -15,10 +15,12 @@ public class Tile : MonoBehaviour
 		public Vector3 direction = Vector3.right;
 		private Vector3 startPosition;
 		public Vector3 endPosition;
+		public Vector3 slotPosition;
 		private Vector2 xBounds = Vector2.zero;
 		private Vector2 yBounds = Vector2.zero;
 		public bool flag = false;
 		private float duration = 30f;
+		private float slotDuration = 8f;
 		public bool setToDestroy = false;
 		public bool destroying = false;
 		private Vector3 destroySize = new Vector3 (0.00001f, 0.00001f, 0.00001f);
@@ -27,6 +29,8 @@ public class Tile : MonoBehaviour
 		public int slotIndex = -1;
 		private Vector3[] wayPoints = new Vector3[9];
 		public static float RADIUS = TileMap.tileSize / 2.0f;
+		private Color nonTransparent;
+		private Color transparent;
 
 
 		public enum TileType
@@ -43,6 +47,9 @@ public class Tile : MonoBehaviour
 		{
 				endPosition = gameObject.transform.position;	
 				SetUpWayPoints ();
+				nonTransparent = gameObject.renderer.material.color;
+				transparent = nonTransparent;
+				transparent.a = 0.8f;
 		}
 
 		public static TileType getTileType (string tileString)
@@ -50,13 +57,13 @@ public class Tile : MonoBehaviour
 				switch (tileString) {
 				case "block":
 						return TileType.Block;
-				case "cross-junction":
+				case "crossroad":
 						return TileType.CrossJunction;
 				case "t-junction":
 						return TileType.TJunction;
-				case "right-angle-junction":
+				case "right-angle":
 						return TileType.Curve;
-				case "straight-junction":
+				case "straight":
 						return TileType.Straight;
 				default :
 						return TileType.Empty;
@@ -489,14 +496,12 @@ public class Tile : MonoBehaviour
 				} else if (flag && Mathf.Approximately (gameObject.transform.position.magnitude, endPosition.magnitude)) {
 						flag = false;
 						CheckDestroy ();
-
 				}
 
-				if (destroying && !Mathf.Approximately (gameObject.transform.localScale.magnitude, destroySize.magnitude)) {
-						ShrinkTile ();
-				} else if (destroying && Mathf.Approximately (gameObject.transform.localScale.magnitude, destroySize.magnitude)) {
+				if (destroying && !Mathf.Approximately (gameObject.transform.position.magnitude, slotPosition.magnitude)) {
+						MoveToSlot ();
+				} else if (destroying && Mathf.Approximately (gameObject.transform.position.magnitude, slotPosition.magnitude)) {
 						PutTileInSlot ();
-						
 			
 				}
 		}
@@ -506,6 +511,8 @@ public class Tile : MonoBehaviour
 				PlayerDeck deck = GameObject.FindObjectOfType<PlayerDeck> ();				
 				deck.PutTileInSlot (this.gameObject, slotIndex);
 				this.transform.localScale = new Vector3 (0.5f, 0.5f, 1f);
+				gameObject.renderer.material.color = nonTransparent;
+				gameObject.GetComponent<SpriteRenderer> ().sortingLayerName = "Board";
 				destroying = false;
 				setToDestroy = false;
 		}
@@ -535,6 +542,14 @@ public class Tile : MonoBehaviour
 		void ShrinkTile ()
 		{
 				gameObject.transform.localScale = Vector3.Lerp (gameObject.transform.localScale, destroySize, 1 / (duration * (Vector3.Distance (gameObject.transform.localScale, destroySize))));
+		}
+
+		void MoveToSlot ()
+		{
+				this.transform.localScale = new Vector3 (1.2f, 1.2f, 1f);
+				gameObject.renderer.material.color = transparent;
+				gameObject.GetComponent<SpriteRenderer> ().sortingLayerName = "Top Layer";
+				gameObject.transform.position = Vector3.Lerp (gameObject.transform.position, slotPosition, 1 / (slotDuration * (Vector3.Distance (gameObject.transform.position, slotPosition))));
 		}
 
 	
@@ -622,7 +637,7 @@ public class Tile : MonoBehaviour
 				return tileArray;
 		}
 
-		private static Quaternion GetQuaternion (int rotation)
+		public static Quaternion GetQuaternion (int rotation)
 		{
 				switch (rotation) {
 				case 0:
@@ -640,20 +655,6 @@ public class Tile : MonoBehaviour
 		public void SetInPlayerHand (bool isInPlayerHand)
 		{
 				this.isInPlayerHand = isInPlayerHand;
-		}
-
-		public string Serialize ()
-		{
-				int rot = Mathf.FloorToInt (gameObject.transform.rotation.eulerAngles.z);
-				return getTileString (this.type) + ":" + rot;
-		}
-
-		public static Tile Deserialize (string tileString)
-		{
-				string[] split = tileString.Split (':');
-				Tile tile = Resources.Load ("Tiles/Prefabs/" + split [0]) as Tile;
-				tile.transform.rotation = GetQuaternion (int.Parse (split [1]));
-				return tile;
 		}
 	
 }

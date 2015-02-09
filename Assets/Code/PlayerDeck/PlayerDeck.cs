@@ -5,9 +5,13 @@ using System.Collections;
 public class PlayerDeck : MonoBehaviour
 {
 		public static DeckTile selectedTile;
-		private DeckTile[] slots;
-		private int numberOfSlots = 3;
-		private Vector2[] slotPosition = {new Vector2 (6.85f, 4.05f), new Vector2 (6.85f, 1.8f), new Vector2 (6.85f, -0.45f)};
+		private DeckTile[] slots = new DeckTile[3];
+		public static int numberOfSlots = 3;
+		public static Vector2[] slotPosition = {
+				new Vector2 (6.85f, 4.05f),
+				new Vector2 (6.85f, 1.8f),
+				new Vector2 (6.85f, -0.45f)
+		};
 		public Transform rotateButton;
 
 		void Start ()
@@ -15,7 +19,7 @@ public class PlayerDeck : MonoBehaviour
 				System.DateTime now = System.DateTime.Now;
 				Random.seed = Mathf.FloorToInt (now.Millisecond * now.Minute * now.Day);
 				selectedTile = null;
-				SetUpSlots ();
+				slots = new DeckTile[numberOfSlots];
 		}
 
 		public void SetSelected (DeckTile select)
@@ -33,13 +37,25 @@ public class PlayerDeck : MonoBehaviour
 				return selectedTile != null;
 		}
 
-		private void SetUpSlots ()
+		public void SetUpSpecificSlots (GameObject[] tiles)
+		{
+				for (int i = 0; i < numberOfSlots; i++) {
+						if (tiles [i] != null) {
+								PutTileInSlot (tiles [i], i);
+						}
+							
+				}
+				AddRotateButtons ();
+		}
+
+
+		public void SetUpRandomSlots ()
 		{
 				GameObject[] tiles = Resources.LoadAll<GameObject> ("Tiles/");
 				slots = new DeckTile[numberOfSlots];
 				for (int i = 0; i < numberOfSlots; i++) {
 						GameObject randomTile = tiles [Random.Range (0, tiles.Length)];
-						randomTile.transform.rotation = SetUpRandomRotation ();
+						randomTile.transform.rotation = GetUpRandomRotation ();
 						GameObject slot = Instantiate (randomTile) as GameObject;
 						PutTileInSlot (slot, i);	
 				}
@@ -47,13 +63,12 @@ public class PlayerDeck : MonoBehaviour
 
 		}
 
-		private Quaternion SetUpRandomRotation ()
+		public static Quaternion GetUpRandomRotation ()
 		{
 				Vector3 randomRotation = Vector3.zero;
 				float randomZRotation = 90f * Random.Range (0, 4);
 				randomRotation.z = randomZRotation;
 				return Quaternion.Euler (randomRotation);
-
 		}
 
 		public void PutTileInSlot (GameObject slot, int i)
@@ -65,11 +80,11 @@ public class PlayerDeck : MonoBehaviour
 				if (deckTile == null) {
 						deckTile = slot.AddComponent<DeckTile> ();
 				}
-				slots [i] = deckTile;
 				deckTile.SetSlotPosition (slotPosition [i]);
 				deckTile.SetSlotIndex (i);
 				deckTile.GetComponent<Tile> ().slotIndex = i;
-				slot.transform.parent = this.transform;
+				slots [i] = deckTile;
+				slots [i].transform.parent = this.gameObject.transform;
 		}
 
 		void AddRotateButtons ()
@@ -86,5 +101,19 @@ public class PlayerDeck : MonoBehaviour
 		public Tile GetTileFromIndex (int index)
 		{
 				return slots [index].GetComponent<Tile> ();
+		}
+
+		public Tile[] GetTiles ()
+		{
+				Tile[] tiles = new Tile[numberOfSlots];
+				int i = 0;
+				foreach (DeckTile deckTile in slots) {
+						if (deckTile != null) {
+								tiles [i] = deckTile.GetComponent<Tile> ();
+						}
+						
+						i++;
+				}
+				return tiles;
 		}
 }
