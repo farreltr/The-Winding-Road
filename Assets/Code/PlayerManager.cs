@@ -24,6 +24,11 @@ public class PlayerManager : MonoBehaviour
 		public int yellowWins = 0;
 		private float nameBoxWidth = 120.0f;
 		private float nameBoxHeight = 20.0f;
+		private int blue = -1;
+		private int red = -1;
+		private int yellow = -1;
+		private int green = -1;
+
 
 		public static PlayerManager playerManager;
 	
@@ -44,23 +49,8 @@ public class PlayerManager : MonoBehaviour
 				for (int i=0; i<4; i++) {
 						list.Add (i);
 				}
-		}
-
-		void OnGUI ()
-		{				
-				if (showCharSelect) {
-						GUI.skin = skin;
-						redPlayerName = GUI.TextField (new Rect (widthRed, height, nameBoxWidth, nameBoxHeight), redPlayerName, 10);
-						bluePlayerName = GUI.TextField (new Rect (widthRed - 3 * distance + 40, height, nameBoxWidth, nameBoxHeight), bluePlayerName, 10);
-						greenPlayerName = GUI.TextField (new Rect (widthRed - 2 * distance + 15, height, nameBoxWidth, nameBoxHeight), greenPlayerName, 10);
-						yellowPlayerName = GUI.TextField (new Rect (widthRed - distance, height, nameBoxWidth, nameBoxHeight), yellowPlayerName, 10);
-						if (GUI.Button (new Rect (Screen.width / 2 - 50, height + 80, 100, 40), "PLAY")) {
-								CreatePlayerDetails ();
-								StartGame ();
-						}
-			
-				}
-		
+				SetUpTurnOrder ();
+				AddAllPlayersAsInactive ();
 		}
 
 		public void Reset ()
@@ -116,17 +106,25 @@ public class PlayerManager : MonoBehaviour
 				}
 		}
 
-		private void CreatePlayerDetails ()
+		/*private void CreatePlayerDetails ()
 		{
-				int blue = UnityEngine.Random.Range (0, 4);
-				int green = GetNextTurn (blue);
-				int yellow = GetNextTurn (green);
-				int red = GetNextTurn (yellow);
+
 				players.Add (new Player (bluePlayerName, Player.Colour.BLUE, blue));	
 				players.Add (new Player (greenPlayerName, Player.Colour.GREEN, green));
 				players.Add (new Player (yellowPlayerName, Player.Colour.YELLOW, yellow));	
 				players.Add (new Player (redPlayerName, Player.Colour.RED, red));
 
+		}*/
+
+		public void AddActivePlayer (Player.Colour colour)
+		{
+				players.Add (new Player (colour, GetTurn (colour), false));
+
+		}
+
+		public void RemoveActivePlayer (Player.Colour colour)
+		{
+				players.Add (new Player (colour, GetTurn (colour), true));
 		}
 
 		int GetNextTurn (int prev)
@@ -137,7 +135,8 @@ public class PlayerManager : MonoBehaviour
 				}
 				return nextTurn;
 		}
-		private void StartGame ()
+
+		public void StartGame ()
 		{
 				showCharSelect = false;
 				players.Sort ();
@@ -165,7 +164,7 @@ public class PlayerManager : MonoBehaviour
 				print (currentPlayer.getPlayerColour ().ToString ());
 		}
 
-		public Player GetPlayerByName (string name)
+		/*	public Player GetPlayerByName (string name)
 		{
 				foreach (Player player in players) {
 						bool isEqual = string.Equals (name, player.getPlayerName (), StringComparison.OrdinalIgnoreCase);
@@ -174,7 +173,7 @@ public class PlayerManager : MonoBehaviour
 						}
 				}
 				return null;
-		}
+		} */
 
 		public Player GetPlayerByColour (string colour)
 		{
@@ -307,5 +306,35 @@ public class PlayerManager : MonoBehaviour
 		public static string GetPlayerString ()
 		{
 				return currentPlayer.getPlayerColour ().ToString ();
+		}
+
+		private void SetUpTurnOrder ()
+		{
+				blue = UnityEngine.Random.Range (0, 4);
+				green = GetNextTurn (blue);
+				yellow = GetNextTurn (green);
+				red = GetNextTurn (yellow);
+		}
+
+		private int GetTurn (Player.Colour colour)
+		{
+				switch (colour) {
+				case Player.Colour.BLUE:
+						return blue;
+				case Player.Colour.RED:
+						return red;
+				case Player.Colour.YELLOW:
+						return yellow;
+				case Player.Colour.GREEN:
+						return green;
+				}
+				return -1;
+		}
+
+		void AddAllPlayersAsInactive ()
+		{
+				foreach (Player.Colour colour in Player.GetColours()) {
+						RemoveActivePlayer (colour);
+				}
 		}
 }

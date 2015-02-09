@@ -46,8 +46,10 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Code\CharacterSelect.cs" />
      <Compile Include="Assets\Code\CurveCollider.cs" />
      <Compile Include="Assets\Code\GameController.cs" />
+     <Compile Include="Assets\Code\MoveDownOnStart.cs" />
      <Compile Include="Assets\Code\Player.cs" />
      <Compile Include="Assets\Code\PlayerDeck\DeckTile.cs" />
      <Compile Include="Assets\Code\PlayerDeck\PlayerDeck.cs" />
@@ -84,6 +86,7 @@
      <Compile Include="Assets\PigeonCoopToolkit\__Navmesh2D Examples\Scripts\Mover.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\__Navmesh2D Examples\Scripts\PathFollower.cs" />
      <None Include="Assets\PigeonCoopToolkit\__SharedDemoAssets\_Shaders\Unlit Transparent Color.shader" />
+     <None Include="Assets\Confetti Particles\Confetti - Readme.txt" />
      <None Include="Assets\PigeonCoopToolkit\External\Editor\Poly2Tri\Poly2Tri Lic.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

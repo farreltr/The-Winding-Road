@@ -4,27 +4,18 @@ using System;
 
 public class Player : IComparable
 {
-
-		private string playerName;
+	
 		private Colour playerColour;
 		private int playerTurn;
 		public bool isCPU = false;
-		
-		public Player (string playerName, Colour playerColour, int playerTurn)
+
+		public Player (Colour playerColour, int playerTurn, bool isCPU)
 		{
-				this.playerName = playerName;
 				this.playerColour = playerColour;
 				this.playerTurn = playerTurn;
-				if (playerName.Equals ("CPU")) {
-						isCPU = true;
-				}
+				this.isCPU = isCPU;
 		}
-
-		public string getPlayerName ()
-		{
-				return playerName;
-		}
-
+	
 		public Colour getPlayerColour ()
 		{
 				return playerColour;
@@ -33,11 +24,6 @@ public class Player : IComparable
 		public int getPlayerTurn ()
 		{
 				return  playerTurn;
-		}
-
-		public void setPlayerName (string playerName)
-		{
-				this.playerName = playerName;
 		}
 
 		public void setPlayerColour (Colour playerColour)
@@ -60,7 +46,29 @@ public class Player : IComparable
 				RED,
 				BLUE,
 				GREEN,
-				YELLOW
+				YELLOW,
+				NONE
+		}
+
+		public static Colour[] GetColours ()
+		{
+				Colour[] colours = {Colour.RED, Colour.BLUE, Colour.YELLOW, Colour.GREEN};
+				return colours;
+		}
+
+		public static Colour GetPlayerColour (string colour)
+		{
+				switch (colour) {
+				case "RED":
+						return Colour.RED;
+				case "BLUE":
+						return Colour.BLUE;
+				case "GREEN":
+						return Colour.GREEN;
+				case "YELLOW":
+						return Colour.YELLOW;
+				}
+				return Colour.NONE;
 		}
 
 		public int CompareTo (object obj)

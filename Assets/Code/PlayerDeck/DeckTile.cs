@@ -16,6 +16,7 @@ public class DeckTile : MonoBehaviour
 		private bool draggable = true;
 		private int slotIndex;
 		private Transform child;
+		public bool disabled = false;
 	
 		void Start ()
 		{
@@ -28,12 +29,12 @@ public class DeckTile : MonoBehaviour
 						this.gameController = GameObject.FindObjectOfType<GameController> ();
 						this.parent = gameObject.GetComponentInParent<PlayerDeck> ();
 				}
-				
+				disabled = false;
 		}
 	
 		void OnMouseDrag ()
 		{
-				if (draggable) {
+				if (draggable && !disabled) {
 						Vector3 curScreenPoint = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
 						Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
 						transform.position = curPosition;
@@ -44,37 +45,41 @@ public class DeckTile : MonoBehaviour
 
 		void OnMouseUp ()
 		{
-				gameObject.transform.localScale = Vector3.one / 2f;
-				float radius = this.transform.localScale.x / 2;
-				Vector2 point = new Vector2 ();
-				point.x = this.transform.position.x + radius;
-				point.y = this.transform.position.y + radius;
-				Collider2D[] colliders = Physics2D.OverlapCircleAll (point, radius, Physics.AllLayers, -Mathf.Infinity, Mathf.Infinity);
-				Vector3 position = Vector3.zero;
-				foreach (Collider2D collider in colliders) {
-						bool notThis = collider.gameObject != this.gameObject;
-						bool isArrow = collider.gameObject.GetComponent<Arrow> () != null;
-						if (notThis && isArrow) {
-								position = collider.transform.position;
-								gameObject.transform.position = position;
-								gameController.SetCurrentX (Mathf.RoundToInt (position.x) + 4);
-								gameController.SetCurrentY (Mathf.RoundToInt (position.y) + 4);
-								Arrow arrow = collider.gameObject.GetComponent<Arrow> ();
-								gameController.SetDirection (arrow.GetDirection ());
-								this.draggable = false;
-								SetHit (true);
+				if (!disabled) {
+						gameObject.transform.localScale = Vector3.one / 2f;
+						float radius = this.transform.localScale.x / 2;
+						Vector2 point = new Vector2 ();
+						point.x = this.transform.position.x + radius;
+						point.y = this.transform.position.y + radius;
+						Collider2D[] colliders = Physics2D.OverlapCircleAll (point, radius, Physics.AllLayers, -Mathf.Infinity, Mathf.Infinity);
+						Vector3 position = Vector3.zero;
+						foreach (Collider2D collider in colliders) {
+								bool notThis = collider.gameObject != this.gameObject;
+								bool isArrow = collider.gameObject.GetComponent<Arrow> () != null;
+								if (notThis && isArrow) {
+										position = collider.transform.position;
+										gameObject.transform.position = position;
+										gameController.SetCurrentX (Mathf.RoundToInt (position.x) + 4);
+										gameController.SetCurrentY (Mathf.RoundToInt (position.y) + 4);
+										Arrow arrow = collider.gameObject.GetComponent<Arrow> ();
+										gameController.SetDirection (arrow.GetDirection ());
+										this.draggable = false;
+										SetHit (true);
+								}
 						}
+						SetReleased (true);
+						if (!IsHit ()) {
+								gameObject.transform.position = slotPosition;
+						}
+
 				}
-				SetReleased (true);
-				if (!IsHit ()) {
-						gameObject.transform.position = slotPosition;
-				}
+
 		}
 
 
 		void OnMouseDown ()
 		{
-				if (draggable) {
+				if (draggable && !disabled) {
 						parent.SetSelected (this);
 						screenPoint = Camera.main.WorldToScreenPoint (gameObject.transform.position);			
 						offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
@@ -117,6 +122,11 @@ public class DeckTile : MonoBehaviour
 		public void SetHit (bool hit)
 		{
 				this.hit = hit;
+				DeckTile[] dts = GameObject.FindObjectsOfType<DeckTile> ();
+				foreach (DeckTile dt in dts) {
+						dt.disabled = true;
+						dt.draggable = false;
+				}
 		}
 				
 		public bool IsHit ()

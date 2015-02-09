@@ -7,6 +7,7 @@ public class PlayerDeck : MonoBehaviour
 		public static DeckTile selectedTile;
 		private DeckTile[] slots = new DeckTile[3];
 		public static int numberOfSlots = 3;
+		public bool disabled = false;
 		public static Vector2[] slotPosition = {
 				new Vector2 (6.85f, 4.05f),
 				new Vector2 (6.85f, 1.8f),
@@ -20,6 +21,7 @@ public class PlayerDeck : MonoBehaviour
 				Random.seed = Mathf.FloorToInt (now.Millisecond * now.Minute * now.Day);
 				selectedTile = null;
 				slots = new DeckTile[numberOfSlots];
+				disabled = false;
 		}
 
 		public void SetSelected (DeckTile select)
@@ -100,7 +102,12 @@ public class PlayerDeck : MonoBehaviour
 
 		public Tile GetTileFromIndex (int index)
 		{
-				return slots [index].GetComponent<Tile> ();
+				foreach (DeckTile dt in GameObject.FindObjectsOfType<DeckTile>()) {
+						if (dt != null && dt.GetSlotIndex () == index) {
+								return dt.GetComponent<Tile> ();
+						}
+				}
+				return null;
 		}
 
 		public Tile[] GetTiles ()
@@ -115,5 +122,14 @@ public class PlayerDeck : MonoBehaviour
 						i++;
 				}
 				return tiles;
+		}
+
+		void Update ()
+		{
+				foreach (DeckTile dt in slots) {
+						if (dt != null) {
+								dt.disabled = disabled;
+						}
+				}
 		}
 }

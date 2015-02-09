@@ -120,11 +120,19 @@ public class GameController : MonoBehaviour
 
 		private bool HandleTile ()
 		{
+				BlockUserInput ();
 				ShiftBoardTiles ();
 				ShiftPlayers ();
 				EndTileFall ();
 				TriggerMoveEvent ();
 				return true;
+		}
+
+		void BlockUserInput ()
+		{
+				PlayerDeck pd = GameObject.FindObjectOfType<PlayerDeck> ();
+				pd.disabled = true;
+
 		}
 
 		void TriggerMoveEvent ()
@@ -400,7 +408,7 @@ public class GameController : MonoBehaviour
 										//GameObject.FindObjectOfType<Inventory> ().SetDisabled ();	
 										PlayerManager pm = GameController.FindObjectOfType<PlayerManager> ();
 										Player p = pm.GetPlayerByColour (controller.name);
-										gameOverText = p.getPlayerName () + " Wins!";										
+										//gameOverText = p.getPlayerName () + " Wins!";										
 								}
 						}
 
