@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class PlayerController : MonoBehaviour
 {
-		private float speed;
+		public float speed;
 		private static float SPEED = 0.5f;
 		public static float STOPPED = 0.0f;
 		public Vector2 direction;	
@@ -18,10 +18,6 @@ public abstract class PlayerController : MonoBehaviour
 		public static Vector2 LEFT = new Vector2 (-1.0f, 0.0f);
 		public static Vector2 UP = new Vector2 (0.0f, 1.0f);
 		public static Vector2 DOWN = new Vector2 (0.0f, -1.0f);
-		public static Vector2 RIGHT_UP = new Vector2 (1.0f, 1.0f);
-		public static Vector2 LEFT_UP = new Vector2 (-1.0f, 1.0f);
-		public static Vector2 RIGHT_DOWN = new Vector2 (1.0f, -1.0f);
-		public static Vector2 LEFT_DOWN = new Vector2 (-1.0f, -1.0f);
 		public static Vector2 STOP = new Vector2 (0.0f, 0.0f);
 		public bool isWinner = false;
 		public bool isRespawn = true;
@@ -36,14 +32,27 @@ public abstract class PlayerController : MonoBehaviour
 		public const float NINETY = 90.0f;
 		public const float ONE_EIGHTY = 180.0f;
 		public const float TWO_SEVENTY = 270.0f;
+
+		/*
+	 * In "respawn mode" disable all colliders and set up initial "walk to gate" waypoints
+	 * In Update() - Auto adjust to centre of tile based on direction X
+	 * Check when out of bounds and adjust 1/2 X
+	 * Turn on corners X
+	 * Turn random on T junctions
+	 * Shift appropriately on tile insert
+	 * collide with castle to win
+	 * pop if off board 
+	 * don't collide with deck tiles X
+	 * */
 		
 
 		public void Start ()
 		{
 				animator = this.GetComponent<Animator> ();
 				direction = startDirection;
-				this.transform.position = respawnPosition;
+				//this.transform.localPosition = respawnPosition;
 				//this.speed = STOPPED;
+				isRespawn = true;
 				this.speed = SPEED;
 		}
  
@@ -58,17 +67,22 @@ public abstract class PlayerController : MonoBehaviour
 						animator.enabled = true;
 				}
 				if (!isRespawn && isOutOfBounds) {
-						//ChangeDirection ();
+						ChangeDirection ();
 						//MoveIntoBounds ();
 				}
-				if (!isOutOfBounds && !isTileMoving ()) {
+				if (!isOutOfBounds && !isTileMoving () && isRespawn) {
 						isRespawn = false;
 				}
+
 				if (isRespawn && !flag) {
-						if (canMove ()) {
+						if (canMove () && !isTileMoving ()) {
+								gameObject.GetComponent<BoxCollider2D> ().enabled = true;
 								speed = SPEED;
+								animator.enabled = true;
 						}
 				}
+
+				
 
 				if (flag && !Mathf.Approximately (gameObject.transform.position.magnitude, endPosition.magnitude) && !isRespawn) {
 						//move the gameobject to the desired position
@@ -78,6 +92,7 @@ public abstract class PlayerController : MonoBehaviour
 						movement *= Time.deltaTime;
 						transform.Translate (movement);
 						SetDirection ();
+						CentreCharacter ();
 				}
 				if (flag && Mathf.Approximately (gameObject.transform.position.magnitude, endPosition.magnitude)) {
 						flag = false;
@@ -91,36 +106,71 @@ public abstract class PlayerController : MonoBehaviour
 				return gameController.IsTileMoving ();
 		}
 
+		void CentreCharacter ()
+		{
+				if (!IsOutOfbounds ()) {
+						bool centerHoriz = Mathf.Approximately (direction.y, 0f);
+						bool centerVert = Mathf.Approximately (direction.x, 0f);
+						Vector2 coordinate = GetCurrentCoordinate ();
+						Vector3 newPosition = transform.localPosition;
+						if (centerHoriz) {					
+								newPosition.y = 1.9f + (coordinate.y * 1.1f);
+				
+						} else if (centerVert) {
+								newPosition.x = 1.7f + (coordinate.x * 1.1f);
+						}
+						transform.localPosition = newPosition;
+
+				}
+
+		}
+
 
 		public abstract bool canMove ();
+
+		Vector2 GetCurrentCoordinate ()
+		{
+				Collider2D[] colliders = Physics2D.OverlapCircleAll (new Vector2 (transform.position.x, transform.position.y), 0.1f);
+				Vector2 coordinate = new Vector2 (Mathf.RoundToInt (transform.position.x + 3f) / TileMap.tileSize, Mathf.RoundToInt (transform.position.y + 3f) / TileMap.tileSize);
+				foreach (Collider2D collider2D in colliders) {
+						Tile tile = collider2D.gameObject.GetComponent<Tile> ();
+						DeckTile deckTile = collider2D.gameObject.GetComponent<DeckTile> ();
+						if (tile != null && deckTile == null) {
+								coordinate = tile.coordinate;
+						}
+				}
+				return coordinate;
+		}
 
 
 		void SetDirection ()
 		{
 				if (direction.y > 0) {
 						animator.SetInteger ("direction", 2);
-				} else
-		        if (direction.y < 0) {
+				} else if (direction.y < 0) {
 						animator.SetInteger ("direction", 0);
-				} else
-				if (direction.x > 0) {
+				} else if (direction.x > 0) {
 						animator.SetInteger ("direction", 3);
 				} else if (direction.x < 0) {
 						animator.SetInteger ("direction", 1);
 				}
 		}
 
-		void OnCollisionEnter2D (Collision2D collision)
+		void OnTriggerEnter2D (Collider2D collide)
 		{
-				if (!isRespawn && !IsMe (collision.collider.collider2D)) {
-						if (collision.collider.collider2D is BoxCollider2D) {
-								ChangeDirection ();
-								PlayerController collisionController = collision.gameObject.GetComponent<PlayerController> ();
-								if (collisionController != null) {
-										collisionController.ChangeDirection ();
+				if (collide.gameObject.GetComponent<DeckTile> () == null) {
+						if (!isRespawn && !IsMe (collide)) {
+								if (collide is BoxCollider2D) {
+										ChangeDirection ();
+										PlayerController collisionController = collide.gameObject.GetComponent<PlayerController> ();
+										if (collisionController != null) {
+												collisionController.ChangeDirection ();
+										}
+					
 								}
-
+				
 						}
+
 
 				}
 
@@ -133,17 +183,7 @@ public abstract class PlayerController : MonoBehaviour
 
 		public void ChangeDirection ()
 		{
-				/*if (direction == RIGHT) {
-						direction = LEFT;
-				} else if (direction == LEFT) {
-						direction = RIGHT;
-				} else if (direction == UP) {
-						direction = DOWN;
-				} else if (direction == DOWN) {
-						direction = UP;
-				}	*/
 				direction = -1 * direction;
-				//transform.Translate (direction);
 		}
 	
 	
@@ -198,30 +238,7 @@ public abstract class PlayerController : MonoBehaviour
 						direction = RIGHT;
 				} else if (direction == DOWN) {
 						direction = LEFT;
-				}		
-				//transform.Translate (direction);
-		}
-
-		public void Turn45Right ()
-		{
-				if (direction == RIGHT) {
-						direction = RIGHT_DOWN;
-				} else if (direction == LEFT) {
-						direction = LEFT_UP;
-				} else if (direction == UP) {
-						direction = RIGHT_UP;
-				} else if (direction == DOWN) {
-						direction = LEFT_DOWN;
-				} else if (direction == RIGHT_DOWN) {
-						direction = DOWN;
-				} else if (direction == LEFT_DOWN) {
-						direction = LEFT;
-				} else if (direction == RIGHT_UP) {
-						direction = RIGHT;
-				} else if (direction == LEFT_UP) {
-						direction = UP;
 				}
-				//transform.Translate (direction);
 		}
 
 		public void TurnLeft ()
@@ -234,55 +251,49 @@ public abstract class PlayerController : MonoBehaviour
 						direction = LEFT;
 				} else if (direction == DOWN) {
 						direction = RIGHT;
-				}		
-				//transform.Translate (direction);
-		
-		}
-
-		public void Turn45Left ()
-		{
-
-				if (direction == RIGHT) {
-						direction = RIGHT_UP;
-				} else if (direction == LEFT) {
-						direction = LEFT_DOWN;
-				} else if (direction == UP) {
-						direction = LEFT_UP;
-				} else if (direction == DOWN) {
-						direction = RIGHT_DOWN;
-				} else if (direction == RIGHT_DOWN) {
-						direction = RIGHT;
-				} else if (direction == LEFT_DOWN) {
-						direction = DOWN;
-				} else if (direction == RIGHT_UP) {
-						direction = UP;
-				} else if (direction == LEFT_UP) {
-						direction = LEFT;
 				}
-				//transform.Translate (direction);
 		
 		}
 
 		public bool checkRespawn (int x, int y)
 		{
-				int x_idx = Mathf.FloorToInt (GetPosition ().x / TileMap.tileSize);
-				int y_idx = Mathf.FloorToInt (GetPosition ().y / TileMap.tileSize);
+				int x_idx = GetColumn ();
+				int y_idx = GetRow ();
 				return x == x_idx && y == y_idx;
 		}
 
 		public bool isOnRow (int y)
 		{
-				return y.Equals (Mathf.FloorToInt (transform.localPosition.y / TileMap.tileSize));
+				return !isRespawn && (y - 1).Equals (GetRow ());
+		}
+
+		private int GetRow ()
+		{
+				if (isRespawn) {
+						return -1;
+				}
+				int row = Mathf.RoundToInt ((transform.localPosition.y - 1.9f) / TileMap.tileSize);
+				return row;
 		}
 
 		public bool isOnColumn (int x)
 		{ 	
-				return x.Equals (GetCoordFromPos (GetPosition ().x));
+				//return x.Equals (GetCoordFromPos (GetPosition ().x));
+				return !isRespawn && (x - 1).Equals (GetColumn ());
+		}
+
+		private int GetColumn ()
+		{
+				if (isRespawn) {
+						return -1;
+				}
+				int column = Mathf.RoundToInt ((transform.localPosition.x - 1.7f) / TileMap.tileSize);
+				return column;
 		}
 		
 		private int GetCoordFromPos (float pos)
 		{
-				return (Mathf.FloorToInt (pos / TileMap.tileSize));
+				return (Mathf.RoundToInt (pos / TileMap.tileSize));
 		}
 
 		/*public Tile GetTileAtCoordinate (Vector2 coordinate)
@@ -300,20 +311,19 @@ public abstract class PlayerController : MonoBehaviour
 		void respawn ()
 		{
 				speed = STOPPED;
-				gameObject.GetComponent<BoxCollider2D> ().enabled = false;
 				animator.SetBool ("pop", true);
 				gameObject.audio.Play ();	
+				gameObject.GetComponent<BoxCollider2D> ().enabled = false;
 				StartCoroutine ("Wait");
 
 		}
 
 		IEnumerator Wait ()
 		{
-				yield return new WaitForSeconds (2);				
-				this.transform.position = respawnPosition;
+				yield return new WaitForSeconds (1);
+				this.transform.localPosition = respawnPosition;
 				animator.SetBool ("pop", false);
 				direction = startDirection;
-				gameObject.GetComponent<BoxCollider2D> ().enabled = true;
 				transform.Translate (direction);
 				isRespawn = true;
 		}
@@ -329,13 +339,13 @@ public abstract class PlayerController : MonoBehaviour
 
 		public bool isEqual (float x, float y)
 		{
-				return Mathf.FloorToInt (x) == Mathf.FloorToInt (y);				
+				return Mathf.RoundToInt (x) == Mathf.RoundToInt (y);				
 		}
-	
+
 		public void ShiftRight (int x, int y)
 		{
 				if (this.isOnRow (y)) {
-						if (checkRespawn (x + TileMap.size_x - 2, y)) {
+						if (checkRespawn (x + Board.boardSizeX - 1, y - 1)) {
 								respawn ();
 						} else {
 								if (!isRespawn) {
@@ -352,7 +362,7 @@ public abstract class PlayerController : MonoBehaviour
 		public void ShiftUp (int x, int y)
 		{
 				if (isOnColumn (x)) {
-						if (checkRespawn (x, y + TileMap.size_y - 2)) {
+						if (checkRespawn (x - 1, y + Board.boardSizeY - 1)) {
 								respawn ();
 						} else {
 								if (!isRespawn) {
@@ -367,7 +377,7 @@ public abstract class PlayerController : MonoBehaviour
 		public void ShiftLeft (int x, int y)
 		{
 				if (isOnRow (y)) {
-						if (checkRespawn (x - TileMap.size_x - 2, y)) {
+						if (checkRespawn (x - Board.boardSizeX - 1, y - 1)) {
 								respawn ();
 						} else {
 								if (!isRespawn) {
@@ -382,7 +392,7 @@ public abstract class PlayerController : MonoBehaviour
 		public void ShiftDown (int x, int y)
 		{
 				if (isOnColumn (x)) {
-						if (checkRespawn (x, y - TileMap.size_y - 2)) {
+						if (checkRespawn (x - 1, y - Board.boardSizeY - 1)) {
 								respawn ();
 						} else {
 								if (!isRespawn) {
@@ -394,23 +404,3 @@ public abstract class PlayerController : MonoBehaviour
 				}
 		}
 }
-
-//		void OnSerializeNetworkView (BitStream stream, NetworkMessageInfo info)
-//		{
-//				// Always send transform (depending on reliability of the network view)
-//				if (stream.isWriting) {
-//						Vector3 pos = gameObject.transform.localPosition;
-//						Quaternion rot = gameObject.transform.localRotation;
-//						stream.Serialize (ref pos);
-//						stream.Serialize (ref rot);
-//				}
-//		// When receiving, buffer the information
-//		else {
-//						// Receive latest state information
-//						Vector3 pos = Vector3.zero;
-//						Quaternion rot = Quaternion.identity;
-//						stream.Serialize (ref pos);
-//						stream.Serialize (ref rot);
-//						gameObject.transform.localRotation = rot;
-//						gameObject.transform.localPosition = pos;//				}
-//		}

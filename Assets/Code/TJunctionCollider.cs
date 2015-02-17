@@ -51,48 +51,8 @@ public class TJunctionCollider : MonoBehaviour
 
 				}
 
-				if (direction == PlayerController.RIGHT_UP) {
-						if (rotation == 270) {
-								return Direction.RIGHT;
-						}
-						if (rotation == 90) {
-								return Direction.LEFT;
-						}
-			
-				}
-
-				if (direction == PlayerController.RIGHT_DOWN) {
-						if (rotation == 180) {
-								return Direction.RIGHT;
-						}
-						if (rotation == 0) {
-								return Direction.LEFT;
-						}
-			
-				}
-
 				if (direction == PlayerController.LEFT) {
 						if (rotation == 0) {
-								return Direction.RIGHT;
-						}
-						if (rotation == 270) {
-								return Direction.LEFT;
-						}
-			
-				}
-
-				if (direction == PlayerController.LEFT_UP) {
-						if (rotation == 0) {
-								return Direction.RIGHT;
-						}
-						if (rotation == 180) {
-								return Direction.LEFT;
-						}
-			
-				}
-		
-				if (direction == PlayerController.LEFT_DOWN) {
-						if (rotation == 180) {
 								return Direction.RIGHT;
 						}
 						if (rotation == 270) {

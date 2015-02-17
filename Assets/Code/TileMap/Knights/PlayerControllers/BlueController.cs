@@ -9,9 +9,9 @@ public class BlueController : PlayerController
 		new void Start ()
 		{
 				name = "blue";
-				//respawnPosition = new Vector3 (900.0f, 980.0f, 0);
-				respawnPosition = this.transform.position;
-				startDirection = new Vector2 (0.0f, -1.0f);
+				respawnPosition = new Vector3 (9f, 1.9f, 0);
+				//respawnPosition = this.transform.position;
+				startDirection = new Vector2 (-1f, 0f);
 				respawnSprite = gameObject.GetComponent<SpriteRenderer> ().sprite;
 				base.Start ();
 		}

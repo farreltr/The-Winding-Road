@@ -3,12 +3,13 @@ using System.Collections;
 
 public class MoveDownOnStart : MonoBehaviour
 {
-		private bool move = false;
-		private Vector3 endPosition = Vector3.zero;
+		public bool move = false;
+		private Vector3 endPosition = new Vector3 (0f, 0f, -1f);
 		private float duration = 10f;
 		private PlayerManager playerManager;
 		private bool clickable = false;
-		private float time = 0.0f;
+		//private float time = 0.0f;
+		public Sprite startJourney;
 
 		void Start ()
 		{
@@ -24,20 +25,31 @@ public class MoveDownOnStart : MonoBehaviour
 						ChangeText ();
 						MakeClickable ();
 				}
-				time += Time.deltaTime;
-				if (time > 3.0f) {
-						move = true;
-				}
+				//time += Time.deltaTime;
+				//if (time > 3.0f) {
+				//		move = true;
+				//}
 		}
 
 		void ChangeText ()
 		{
-
+				StartCoroutine ("WaitAndDo", 1);
 		}
+
+		IEnumerator WaitAndDo (int secs)
+		{
+				yield return new WaitForSeconds (secs);
+				GetComponent<SpriteRenderer> ().sprite = startJourney;
+		}
+
 
 		void MakeClickable ()
 		{
 				clickable = true;
+				CharacterSelect[] charSelect = GameObject.FindObjectsOfType<CharacterSelect> ();
+				foreach (CharacterSelect sel in charSelect) {
+						sel.joinGame = true;
+				}
 		}
 
 		void OnMouseUp ()

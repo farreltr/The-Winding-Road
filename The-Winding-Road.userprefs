@@ -1,21 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Code\MoveDownOnStart.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Code\TileMap\Knights\PlayerControllers\PlayerController.cs">
     <Files>
-      <File FileName="Assets\Code\CharacterSelect.cs" Line="45" Column="17" />
-      <File FileName="Assets\Code\PlayerDeck\PlayerDeck.cs" Line="126" Column="1" />
-      <File FileName="Assets\Code\PlayerManager.cs" Line="331" Column="15" />
-      <File FileName="Assets\Code\Player.cs" Line="73" Column="2" />
-      <File FileName="Assets\Code\TileMap\Board\Tile.cs" Line="559" Column="4" />
-      <File FileName="Assets\Code\PlayerDeck\DeckTile.cs" Line="164" Column="60" />
-      <File FileName="Assets\Code\MoveDownOnStart.cs" Line="30" Column="6" />
-      <File FileName="Assets\Code\WaitAndClick.cs" Line="9" Column="1" />
+      <File FileName="Assets\Code\CurveCollider.cs" Line="28" Column="70" />
+      <File FileName="Assets\Code\TileMap\Knights\PlayerControllers\RedController.cs" Line="13" Column="43" />
+      <File FileName="Assets\Code\TileMap\Knights\PlayerControllers\PlayerController.cs" Line="24" Column="34" />
+      <File FileName="Assets\Code\GameController.cs" Line="73" Column="1" />
+      <File FileName="Assets\Code\TileMap\Board\Tile.cs" Line="548" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
-    <Watch file="Assets\Code\PlayerDeck\PlayerDeck.cs" line="40" offsetX="632" offsetY="624" expression="tiles" liveUpdate="False" />
-  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

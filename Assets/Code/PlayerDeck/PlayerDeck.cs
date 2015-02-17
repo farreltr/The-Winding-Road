@@ -92,7 +92,7 @@ public class PlayerDeck : MonoBehaviour
 		void AddRotateButtons ()
 		{
 				for (int i=0; i< numberOfSlots; i++) {
-						Vector3 rotatePosition = new Vector2 (slotPosition [i].x + TileMap.tileSize / 2, slotPosition [i].y - TileMap.tileSize / 2);
+						Vector3 rotatePosition = new Vector3 (slotPosition [i].x + TileMap.tileSize / 2, slotPosition [i].y - TileMap.tileSize / 2, -1f);
 						Transform rotate = Instantiate (rotateButton, rotatePosition, rotateButton.rotation) as Transform;
 						rotate.GetComponent<Rotate> ().index = i;
 						rotate.transform.parent = this.transform;

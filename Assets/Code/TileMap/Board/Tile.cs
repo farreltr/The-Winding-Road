@@ -21,7 +21,7 @@ public class Tile : MonoBehaviour
 		public bool flag = false;
 		private float duration = 30f;
 		private float slotDuration = 8f;
-		public bool setToDestroy = false;
+		public bool setToDeckReturn = false;
 		public bool destroying = false;
 		private Vector3 destroySize = new Vector3 (0.00001f, 0.00001f, 0.00001f);
 		private bool isInPlayerHand = false;
@@ -514,7 +514,7 @@ public class Tile : MonoBehaviour
 				gameObject.renderer.material.color = nonTransparent;
 				gameObject.GetComponent<SpriteRenderer> ().sortingLayerName = "Board";
 				destroying = false;
-				setToDestroy = false;
+				setToDeckReturn = false;
 		}
 
 
@@ -528,7 +528,7 @@ public class Tile : MonoBehaviour
 
 		void CheckDestroy ()
 		{
-				if (setToDestroy) {
+				if (setToDeckReturn) {
 						destroying = true;
 				}
 
@@ -546,7 +546,7 @@ public class Tile : MonoBehaviour
 
 		void MoveToSlot ()
 		{
-				this.transform.localScale = new Vector3 (1.2f, 1.2f, 1f);
+				this.transform.localScale = new Vector3 (0.6f, 0.6f, 1f);
 				gameObject.renderer.material.color = transparent;
 				gameObject.GetComponent<SpriteRenderer> ().sortingLayerName = "Top Layer";
 				gameObject.transform.position = Vector3.Lerp (gameObject.transform.position, slotPosition, 1 / (slotDuration * (Vector3.Distance (gameObject.transform.position, slotPosition))));

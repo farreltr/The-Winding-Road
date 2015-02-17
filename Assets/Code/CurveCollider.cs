@@ -23,9 +23,9 @@ public class CurveCollider : MonoBehaviour
 	
 		}
 
-		void OnTriggerEnter2D (Collider2D collider)
+		void OnCollisionEnter2D (Collision2D collision)
 		{
-				PlayerController playerController = collider.transform.GetComponent<PlayerController> ();
+				PlayerController playerController = collision.collider.collider2D.transform.GetComponent<PlayerController> ();
 				if (playerController != null) {			
 						int rotation = Mathf.RoundToInt (this.transform.eulerAngles.z);
 						Direction direction = getTurningDirection (playerController, rotation);
@@ -51,48 +51,8 @@ public class CurveCollider : MonoBehaviour
 
 				}
 
-				if (direction == PlayerController.RIGHT_UP) {
-						if (rotation == 270) {
-								return Direction.RIGHT;
-						}
-						if (rotation == 90) {
-								return Direction.LEFT;
-						}
-			
-				}
-
-				if (direction == PlayerController.RIGHT_DOWN) {
-						if (rotation == 180) {
-								return Direction.RIGHT;
-						}
-						if (rotation == 0) {
-								return Direction.LEFT;
-						}
-			
-				}
-
 				if (direction == PlayerController.LEFT) {
 						if (rotation == 0) {
-								return Direction.RIGHT;
-						}
-						if (rotation == 270) {
-								return Direction.LEFT;
-						}
-			
-				}
-
-				if (direction == PlayerController.LEFT_UP) {
-						if (rotation == 0) {
-								return Direction.RIGHT;
-						}
-						if (rotation == 180) {
-								return Direction.LEFT;
-						}
-			
-				}
-		
-				if (direction == PlayerController.LEFT_DOWN) {
-						if (rotation == 180) {
 								return Direction.RIGHT;
 						}
 						if (rotation == 270) {

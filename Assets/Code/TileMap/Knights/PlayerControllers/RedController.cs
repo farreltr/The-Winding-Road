@@ -4,15 +4,15 @@ using System.Collections;
 public class RedController : PlayerController
 {
 
-		Vector2 startTileCoordinate = new Vector2 (TileMap.size_x - 2, 1.0f);
+		Vector2 startTileCoordinate = new Vector2 (0f, 0f);
 		new Sprite respawnSprite;
 
 		new void Start ()
 		{
 				name = "red";
-				//respawnPosition = new Vector3 (970.0f, 180.0f, 0);
-				startDirection = new Vector2 (-1.0f, 0.0f);
-				respawnPosition = this.transform.position;
+				respawnPosition = new Vector3 (0f, 1.9f, 0);
+				startDirection = new Vector2 (1f, 0f);
+				//respawnPosition = this.transform.position;
 				this.respawnSprite = gameObject.GetComponent<SpriteRenderer> ().sprite;
 				base.Start ();
 		}
@@ -48,7 +48,7 @@ public class RedController : PlayerController
 						return true;
 				case Tile.TileType.Curve:
 						{
-								if ((isEqual (rotation, ZERO) || isEqual (rotation, TWO_SEVENTY))) {
+								if ((isEqual (rotation, NINETY) || isEqual (rotation, ONE_EIGHTY))) {
 										return true;
 								}
 								break;
@@ -56,7 +56,7 @@ public class RedController : PlayerController
 						}
 				case Tile.TileType.TJunction:
 						{
-								if (!isEqual (rotation, TWO_SEVENTY)) {
+								if (!isEqual (rotation, ZERO)) {
 										return true;
 								}
 								break;
@@ -64,7 +64,7 @@ public class RedController : PlayerController
 						}
 				case Tile.TileType.Straight:
 						{
-								if ((isEqual (rotation, ZERO) || isEqual (rotation, ONE_EIGHTY))) {
+								if ((isEqual (rotation, NINETY) || isEqual (rotation, TWO_SEVENTY))) {
 										return true;
 								}
 								break;

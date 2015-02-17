@@ -9,8 +9,8 @@ public class WaitAndClick : MonoBehaviour
 		void Update ()
 		{
 				time += Time.deltaTime;
-				if (time > 30.0f || Input.anyKey) {
-						Application.LoadLevel (1);
+				if (time > 3.0f || Input.anyKey) {
+						GameObject.FindObjectOfType<MoveDownOnStart> ().move = true;
 				}
 	
 		}

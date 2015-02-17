@@ -59,58 +59,6 @@ public class GameController : MonoBehaviour
 						}
 
 				} 
-
-//				if (isDragging && endPosition != null) {
-//						PlayerDeck.selectedTile.transform.position = endPosition.transform.position;
-//						direction = endPosition.GetDirection ();
-//						currentCoordinateX = endPosition.GetXcoord ();
-//						currentCoordinateY = endPosition.GetYcoord ();
-//						selectedTile = draggingTile;
-//						selectedTile.GetComponent<DeckTile> ().enabled = false;
-//						selectedTile.transform.parent = GameObject.FindObjectOfType<Board> ().transform;
-//						selectedTile.SetNotSelectedColour ();
-//						bool done = HandleTile ();	
-//						selectedTile = null;
-//						endPosition = null;
-//						if (done) {
-//								print ("done");
-//								//SaveLevel ();
-//								//PlayerManager.playerManager.LoadNextLevel ();	
-//								//LoadLevel ();
-//						}
-//
-//				}
-//				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-//				RaycastHit hitInfo;
-//				playerDeck = GameObject.FindObjectOfType<PlayerDeck> ();
-//				bool isHit = TileMap.tileMap.collider.Raycast (ray, out hitInfo, Mathf.Infinity);
-//
-//				if (draggingTile.IsReleased ()) {
-//						mousePosition = hitInfo.point;
-//						currentCoordinateX = Mathf.FloorToInt (hitInfo.point.x / TileMap.tileSize);
-//						currentCoordinateY = Mathf.FloorToInt (hitInfo.point.y / TileMap.tileSize);
-//
-//				}
-//		
-//				if (TileMap.tileMap != null && isHit && isDragging) {
-//						mousePosition = hitInfo.point;
-//						currentCoordinateX = Mathf.FloorToInt (hitInfo.point.x / TileMap.tileSize);
-//						currentCoordinateY = Mathf.FloorToInt (hitInfo.point.y / TileMap.tileSize);
-//
-//						if (draggingTile.IsReleased ()) {
-//								GameObject o = draggingTile.gameObject;
-//								o.transform.parent = GameObject.FindObjectOfType<Board> ().transform;
-//								o.transform.position = new Vector3 (currentCoordinateX, currentCoordinateY, 0.0f);
-//								o.GetComponent<DeckTile> ().enabled = false;
-//								bool done = HandleTile ();		
-//								if (done) {
-//										print ("done");
-//										//	PlayerManager.playerManager.LoadNextLevel ();	
-//								}
-//																			
-//										
-//						}
-//				}
 		}
 
 		public void SetDestination (Arrow endPosition)
@@ -123,8 +71,7 @@ public class GameController : MonoBehaviour
 				BlockUserInput ();
 				ShiftBoardTiles ();
 				ShiftPlayers ();
-				EndTileFall ();
-				TriggerMoveEvent ();
+				EndTileMove ();
 				return true;
 		}
 
@@ -135,19 +82,15 @@ public class GameController : MonoBehaviour
 
 		}
 
-		void TriggerMoveEvent ()
-		{
-				PlayerController[] knights = GameObject.FindObjectsOfType<PlayerController> ();
-				foreach (PlayerController knight in knights) {
-						//knight.isTriggerAction = true;
-				}
-		}
-
-		private void EndTileFall ()
+		private void EndTileMove ()
 		{
 				endTile.slotIndex = draggingTile.GetSlotIndex ();
 				endTile.slotPosition = PlayerDeck.slotPosition [draggingTile.GetSlotIndex ()];
-				endTile.setToDestroy = true;
+				DeckTile deckTile = endTile.gameObject.GetComponent<DeckTile> ();
+				if (deckTile == null) {
+						deckTile = endTile.gameObject.AddComponent<DeckTile> ();
+				}
+				endTile.setToDeckReturn = true;
 				endTile = null;
 		}
 

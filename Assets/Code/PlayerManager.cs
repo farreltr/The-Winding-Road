@@ -139,6 +139,10 @@ public class PlayerManager : MonoBehaviour
 		public void StartGame ()
 		{
 				showCharSelect = false;
+				if (players.ToArray ().Length == 0) {
+						AddAllPlayersAsInactive ();
+						currentPlayerIdx = UnityEngine.Random.Range (0, 4);
+				}
 				players.Sort ();
 				currentPlayer = players [currentPlayerIdx];
 				SetUpPlayerPrefs ();

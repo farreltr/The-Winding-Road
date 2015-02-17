@@ -59,8 +59,8 @@ public class DeckTile : MonoBehaviour
 								if (notThis && isArrow) {
 										position = collider.transform.position;
 										gameObject.transform.position = position;
-										gameController.SetCurrentX (Mathf.RoundToInt (position.x) + 4);
-										gameController.SetCurrentY (Mathf.RoundToInt (position.y) + 4);
+										gameController.SetCurrentX (Mathf.RoundToInt (position.x / TileMap.tileSize) + 4);
+										gameController.SetCurrentY (Mathf.RoundToInt (position.y / TileMap.tileSize) + 4);
 										Arrow arrow = collider.gameObject.GetComponent<Arrow> ();
 										gameController.SetDirection (arrow.GetDirection ());
 										this.draggable = false;

@@ -46,8 +46,7 @@ public class Player : IComparable
 				RED,
 				BLUE,
 				GREEN,
-				YELLOW,
-				NONE
+				YELLOW
 		}
 
 		public static Colour[] GetColours ()
@@ -68,7 +67,7 @@ public class Player : IComparable
 				case "YELLOW":
 						return Colour.YELLOW;
 				}
-				return Colour.NONE;
+				return Colour.RED;
 		}
 
 		public int CompareTo (object obj)

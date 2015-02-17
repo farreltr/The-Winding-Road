@@ -12,10 +12,10 @@ public class GreenController : PlayerController
 		new void Start ()
 		{
 				name = "green";
-				//respawnPosition = new Vector3 (180.0f, 90.0f, 0); 
-				respawnPosition = this.transform.position;
+				respawnPosition = new Vector3 (1f, 8.5f, 0); 
+				//respawnPosition = this.transform.position;
 				this.respawnSprite = gameObject.GetComponent<SpriteRenderer> ().sprite;
-				startDirection = new Vector2 (0.0f, 1.0f);
+				startDirection = new Vector2 (1f, 0f);
 				base.Start ();
 
 		}

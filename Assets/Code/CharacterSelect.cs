@@ -8,6 +8,7 @@ public class CharacterSelect : MonoBehaviour
 		private Player.Colour charColour;
 		private Transform parentChar;
 		private bool isActive = false;
+		public bool joinGame = false;
 	
 		void Start ()
 		{
@@ -39,11 +40,14 @@ public class CharacterSelect : MonoBehaviour
 
 		void OnMouseDown ()
 		{
-				if (isActive) {
-						Deselect ();
-				} else {
-						Select ();
+				if (joinGame) {
+						if (isActive) {
+								Deselect ();
+						} else {
+								Select ();
+						}
 				}
+
 
 		}
 }
