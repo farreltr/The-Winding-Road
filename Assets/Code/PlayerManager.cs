@@ -28,7 +28,8 @@ public class PlayerManager : MonoBehaviour
 		private int red = -1;
 		private int yellow = -1;
 		private int green = -1;
-
+		public bool isGameOver = false;
+		private string winner = "";
 
 		public static PlayerManager playerManager;
 	
@@ -44,6 +45,7 @@ public class PlayerManager : MonoBehaviour
 	
 		void Start ()
 		{
+				Screen.orientation = ScreenOrientation.Landscape;
 				UnityEngine.Random.seed = Mathf.FloorToInt (Time.time);
 				DontDestroyOnLoad (gameObject);
 				for (int i=0; i<4; i++) {
@@ -60,9 +62,14 @@ public class PlayerManager : MonoBehaviour
 				greenPlayerName = "CPU";
 				yellowPlayerName = "CPU";
 				players = new List<Player> ();
-
+				for (int i=0; i<4; i++) {
+						list.Add (i);
+				}
+				SetUpTurnOrder ();
+				AddAllPlayersAsInactive ();
+		
 		}
-
+	
 		public int GetWins (string colour)
 		{
 
@@ -147,8 +154,7 @@ public class PlayerManager : MonoBehaviour
 				currentPlayer = players [currentPlayerIdx];
 				SetUpPlayerPrefs ();
 				Application.LoadLevel (currentPlayer.getPlayerColour ().ToString ());
-				GameController c = Instantiate (controller) as GameController;
-				UpdatePortraits ();
+				//UpdatePortraits ();
 		}
 
 		public void LoadNextLevel ()
@@ -164,7 +170,7 @@ public class PlayerManager : MonoBehaviour
 //						inventory.Save ();
 //				}
 				Application.LoadLevel (currentPlayer.getPlayerColour ().ToString ());
-				UpdatePortraits ();
+				//UpdatePortraits ();
 				print (currentPlayer.getPlayerColour ().ToString ());
 		}
 
@@ -194,8 +200,13 @@ public class PlayerManager : MonoBehaviour
 		public void OnLevelWasLoaded (int i)
 		{
 				print (Application.loadedLevelName);
-				if (Application.loadedLevelName != "Character Select") {
+
+				if (Application.loadedLevelName != "Character Select" && !isGameOver) {
 						LoadLevel ();
+						//GameController.isCPU = PlayerManager.currentPlayer.isCPU;
+						foreach (Tile tile in GameObject.FindObjectsOfType<Tile>()) {
+								tile.flag = false;
+						}
 				}
 				
 		}
@@ -208,6 +219,8 @@ public class PlayerManager : MonoBehaviour
 //
 //				Destroy (GameObject.FindObjectOfType<GameController> ());
 //				Destroy (GameObject.FindObjectOfType<Inventory> ());
+				this.winner = winner;
+				isGameOver = true;
 				Application.LoadLevel (winner + "_win_screen");
 		}
 
@@ -259,12 +272,22 @@ public class PlayerManager : MonoBehaviour
 	
 		public void LoadLevel ()
 		{
+				GameController c = GameObject.FindObjectOfType<GameController> ();
+				{
+						if (c == null && !isGameOver) {
+								c = Instantiate (controller) as GameController;
+						}
+				}
 				string playerColor = currentPlayer.getPlayerColour ().ToString ();
 				string[] tileStrings = PlayerPrefs.GetString (playerColor).Split ('/');
 				if (tileStrings == null || tileStrings.Length < PlayerDeck.numberOfSlots) {
 						tileStrings = new string[PlayerDeck.numberOfSlots];
 				}
-				PlayerDeck deck = GameObject.FindGameObjectWithTag (playerColor + "_deck").GetComponent<PlayerDeck> ();
+				GameObject deckObject = GameObject.FindGameObjectWithTag (playerColor + "_deck");
+				PlayerDeck deck = null;
+				if (deckObject != null) {
+						deck = deckObject.GetComponent<PlayerDeck> ();
+				}
 				if (deck != null) {
 						GameObject[] currentPlayerDeck = new GameObject[PlayerDeck.numberOfSlots];
 						if (tileStrings != null) {
@@ -315,9 +338,9 @@ public class PlayerManager : MonoBehaviour
 		private void SetUpTurnOrder ()
 		{
 				blue = UnityEngine.Random.Range (0, 4);
-				green = GetNextTurn (blue);
-				yellow = GetNextTurn (green);
-				red = GetNextTurn (yellow);
+				red = GetNextTurn (blue);
+				yellow = GetNextTurn (red);
+				green = GetNextTurn (green);
 		}
 
 		private int GetTurn (Player.Colour colour)

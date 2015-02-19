@@ -3,14 +3,14 @@ using System.Collections;
 
 public class YellowController : PlayerController
 {
-		Vector2 startTileCoordinate = new Vector2 (1.0f, TileMap.size_y - 2);
+		Vector2 startTileCoordinate = new Vector2 (Board.boardSizeX - 1, Board.boardSizeY - 1);
 		new Sprite respawnSprite;
 
 		new void Start ()
 		{
 				name = "yellow";
 				startDirection = new Vector2 (-1.0f, 0.0f);
-				respawnPosition = new Vector3 (9f, 8.5f, 0);	
+				respawnPosition = new Vector3 (10f, 8.5f, 0);	
 				//respawnPosition = this.transform.position;
 				this.respawnSprite = gameObject.GetComponent<SpriteRenderer> ().sprite;
 				base.Start ();
@@ -46,7 +46,7 @@ public class YellowController : PlayerController
 						return true;
 				case Tile.TileType.Curve:
 						{
-								if ((isEqual (rotation, NINETY) || isEqual (rotation, ONE_EIGHTY))) {
+								if ((isEqual (rotation, ZERO) || isEqual (rotation, TWO_SEVENTY))) {
 										return true;
 								}
 								break;
@@ -54,7 +54,7 @@ public class YellowController : PlayerController
 						}
 				case Tile.TileType.TJunction:
 						{
-								if ((!isEqual (rotation, NINETY))) {
+								if ((!isEqual (rotation, ONE_EIGHTY))) {
 										return true;
 								}
 								break;
@@ -62,7 +62,7 @@ public class YellowController : PlayerController
 						}
 				case Tile.TileType.Straight:
 						{
-								if ((isEqual (rotation, ZERO) || isEqual (rotation, ONE_EIGHTY))) {
+								if ((isEqual (rotation, NINETY) || isEqual (rotation, TWO_SEVENTY))) {
 										return true;
 								}
 								break;

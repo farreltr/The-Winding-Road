@@ -27,11 +27,12 @@ public abstract class PlayerController : MonoBehaviour
 		public Vector3 startPosition;
 		public Vector3 endPosition;
 		public bool flag = false;
-		private float duration = 30f;
+		private float duration = 8f;
 		public const float ZERO = 0.0f;
 		public const float NINETY = 90.0f;
 		public const float ONE_EIGHTY = 180.0f;
 		public const float TWO_SEVENTY = 270.0f;
+		private bool change = true;
 
 		/*
 	 * In "respawn mode" disable all colliders and set up initial "walk to gate" waypoints
@@ -51,9 +52,9 @@ public abstract class PlayerController : MonoBehaviour
 				animator = this.GetComponent<Animator> ();
 				direction = startDirection;
 				//this.transform.localPosition = respawnPosition;
-				//this.speed = STOPPED;
+				this.speed = STOPPED;
 				isRespawn = true;
-				this.speed = SPEED;
+				//this.speed = SPEED;
 		}
  
 		void Update ()
@@ -183,7 +184,20 @@ public abstract class PlayerController : MonoBehaviour
 
 		public void ChangeDirection ()
 		{
-				direction = -1 * direction;
+				if (change) {
+						direction = -1 * direction;
+						StartCoroutine ("WaitHalfSec");
+						change = false;
+				}
+				
+
+
+		}
+
+		IEnumerator WaitHalfSec ()
+		{
+				yield return new WaitForSeconds (0.5f);
+				change = true;
 		}
 	
 	
@@ -315,7 +329,6 @@ public abstract class PlayerController : MonoBehaviour
 				gameObject.audio.Play ();	
 				gameObject.GetComponent<BoxCollider2D> ().enabled = false;
 				StartCoroutine ("Wait");
-
 		}
 
 		IEnumerator Wait ()
@@ -401,6 +414,15 @@ public abstract class PlayerController : MonoBehaviour
 										flag = true;
 								}
 						}
+				}
+		}
+
+		void OnCollisionEnter2D (Collision2D collision)
+		{
+				PlayerController knight = collision.gameObject.GetComponent<PlayerController> ();
+				if (knight != null) {
+						ChangeDirection ();
+						knight.ChangeDirection ();
 				}
 		}
 }

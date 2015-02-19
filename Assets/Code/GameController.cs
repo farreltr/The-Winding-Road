@@ -14,7 +14,7 @@ public class GameController : MonoBehaviour
 		public GameObject[] tilePrefabs;
 		private Vector3 mousePosition = Vector3.zero;
 		public bool isTileMoving = false;
-		public bool isCPU = false;
+		//public bool isCPU = false;
 		public string gameOverText = "";
 		private DeckTile selectedTile;
 		private Arrow endPosition;
@@ -55,7 +55,7 @@ public class GameController : MonoBehaviour
 										Destroy (draggable);
 								}
 								print ("done");
-								StartCoroutine ("Wait", 3);
+								StartCoroutine ("Wait", 1.5f);
 						}
 
 				} 
@@ -125,7 +125,7 @@ public class GameController : MonoBehaviour
 						}
 				
 				}
-				StartCoroutine ("Wait", 3);
+				StartCoroutine ("Wait", 1);
 
 
 		}
@@ -346,11 +346,18 @@ public class GameController : MonoBehaviour
 						if (controller != null) {
 //								controller.Stop ();
 								if (controller.isWinner) {
-										PlayerManager.playerManager.WinScreen (controller.GetName ());
 //										Instantiate (Resources.Load<GUITexture> ("End Screens/" + controller.GetName ()));
 										//GameObject.FindObjectOfType<Inventory> ().SetDisabled ();	
 										PlayerManager pm = GameController.FindObjectOfType<PlayerManager> ();
-										Player p = pm.GetPlayerByColour (controller.name);
+										Player p = pm.GetPlayerByColour (controller.name);								
+										foreach (Transform child in gameObject.GetComponentsInChildren<Transform>()) {
+												DestroyImmediate (child.gameObject, true);
+										}
+										DestroyImmediate (this.gameObject, true);
+										this.gameObject.SetActive (false);
+										pm.isGameOver = true;
+										PlayerManager.playerManager.WinScreen (controller.GetName ());
+										gameOver = false;
 										//gameOverText = p.getPlayerName () + " Wins!";										
 								}
 						}
@@ -361,13 +368,7 @@ public class GameController : MonoBehaviour
 						restart = true;
 				}
 
-		}  
-
-		public void OnLevelWasLoaded (int i)
-		{
-				isCPU = PlayerManager.currentPlayer.isCPU;
 		}
-
 
 		public enum TilePosition
 		{

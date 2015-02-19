@@ -5,9 +5,9 @@ public class MoveDownOnStart : MonoBehaviour
 {
 		public bool move = false;
 		private Vector3 endPosition = new Vector3 (0f, 0f, -1f);
-		private float duration = 10f;
+		private float duration = 3f;
 		private PlayerManager playerManager;
-		private bool clickable = false;
+		public bool clickable = false;
 		//private float time = 0.0f;
 		public Sprite startJourney;
 
@@ -33,13 +33,16 @@ public class MoveDownOnStart : MonoBehaviour
 
 		void ChangeText ()
 		{
-				StartCoroutine ("WaitAndDo", 1);
+				StartCoroutine ("WaitAndDo", 0.1f);
 		}
 
 		IEnumerator WaitAndDo (int secs)
 		{
 				yield return new WaitForSeconds (secs);
 				GetComponent<SpriteRenderer> ().sprite = startJourney;
+				foreach (CharacterSelect c in GameObject.FindObjectsOfType<CharacterSelect>()) {
+						c.TurnOffTheLights ();
+				}
 		}
 
 

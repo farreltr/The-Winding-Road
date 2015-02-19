@@ -56,6 +56,7 @@
      <Compile Include="Assets\Code\PlayerManager.cs" />
      <Compile Include="Assets\Code\Restart.cs" />
      <Compile Include="Assets\Code\RestartButton.cs" />
+     <Compile Include="Assets\Code\RestartGame.cs" />
      <Compile Include="Assets\Code\Rotate.cs" />
      <Compile Include="Assets\Code\TJunctionCollider.cs" />
      <Compile Include="Assets\Code\TileMap\Arrows\Arrow.cs" />
@@ -64,6 +65,7 @@
      <Compile Include="Assets\Code\TileMap\Board\Board.cs" />
      <Compile Include="Assets\Code\TileMap\Board\Tile.cs" />
      <Compile Include="Assets\Code\TileMap\Castles\Castles.cs" />
+     <Compile Include="Assets\Code\TileMap\Castles\StairsCollider.cs" />
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\BlueController.cs" />
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\GreenController.cs" />
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\PlayerController.cs" />
@@ -71,6 +73,7 @@
      <Compile Include="Assets\Code\TileMap\Knights\PlayerControllers\YellowController.cs" />
      <Compile Include="Assets\Code\TileMap\TileMap.cs" />
      <Compile Include="Assets\Code\WaitAndClick.cs" />
+     <Compile Include="Assets\Music\Music.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Generic\VersionInformation.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Navmesh2D\NavMesh2D.cs" />
      <Compile Include="Assets\PigeonCoopToolkit\Navmesh2D\NavMesh2DBehaviour.cs" />

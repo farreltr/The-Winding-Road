@@ -19,8 +19,8 @@ public class Tile : MonoBehaviour
 		private Vector2 xBounds = Vector2.zero;
 		private Vector2 yBounds = Vector2.zero;
 		public bool flag = false;
-		private float duration = 30f;
-		private float slotDuration = 8f;
+		private float duration = 8f;
+		private float slotDuration = 2f;
 		public bool setToDeckReturn = false;
 		public bool destroying = false;
 		private Vector3 destroySize = new Vector3 (0.00001f, 0.00001f, 0.00001f);

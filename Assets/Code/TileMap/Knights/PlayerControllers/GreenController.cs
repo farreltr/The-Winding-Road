@@ -4,7 +4,7 @@ using System.Collections;
 public class GreenController : PlayerController
 {
 
-		Vector2 startTileCoordinate = new Vector2 (1.0f, 1.0f);
+		Vector2 startTileCoordinate = new Vector2 (0f, Board.boardSizeY - 1);
 		public int wins = 0;
 		public Sprite winPip;
 		new Sprite respawnSprite;
@@ -12,7 +12,7 @@ public class GreenController : PlayerController
 		new void Start ()
 		{
 				name = "green";
-				respawnPosition = new Vector3 (1f, 8.5f, 0); 
+				respawnPosition = new Vector3 (0f, 8.5f, 0); 
 				//respawnPosition = this.transform.position;
 				this.respawnSprite = gameObject.GetComponent<SpriteRenderer> ().sprite;
 				startDirection = new Vector2 (1f, 0f);
@@ -50,7 +50,7 @@ public class GreenController : PlayerController
 						return true;
 				case Tile.TileType.Curve:
 						{
-								if (isEqual (rotation, ONE_EIGHTY) || isEqual (rotation, TWO_SEVENTY)) {
+								if (isEqual (rotation, NINETY) || isEqual (rotation, ONE_EIGHTY)) {
 										return true;
 								}
 								break;
