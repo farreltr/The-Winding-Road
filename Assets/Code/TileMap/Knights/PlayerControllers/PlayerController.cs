@@ -10,9 +10,9 @@ public abstract class PlayerController : MonoBehaviour
 		private Animator animator;
 		private TileMap tileMap;	
 		private float minX = -3.6f;
-		private float maxX = 3.6f;
+		private float maxX = 3.7f;
 		private float minY = -3.6f;
-		private float maxY = 3.6f;
+		private float maxY = 3.7f;
 		private float boundary = 0.1f;
 		public static Vector2 RIGHT = new Vector2 (1.0f, 0.0f);
 		public static Vector2 LEFT = new Vector2 (-1.0f, 0.0f);
@@ -33,6 +33,8 @@ public abstract class PlayerController : MonoBehaviour
 		public const float ONE_EIGHTY = 180.0f;
 		public const float TWO_SEVENTY = 270.0f;
 		private bool change = true;
+		public Transform defaultParent;
+		private int count = 0;
 
 		/*
 	 * In "respawn mode" disable all colliders and set up initial "walk to gate" waypoints
@@ -55,6 +57,7 @@ public abstract class PlayerController : MonoBehaviour
 				this.speed = STOPPED;
 				isRespawn = true;
 				//this.speed = SPEED;
+				defaultParent = this.transform.parent;
 		}
  
 		void Update ()
@@ -71,6 +74,9 @@ public abstract class PlayerController : MonoBehaviour
 						ChangeDirection ();
 						//MoveIntoBounds ();
 				}
+
+				MaybeTurn ();
+				TotallyOutOfBounds ();
 				if (!isOutOfBounds && !isTileMoving () && isRespawn) {
 						isRespawn = false;
 				}
@@ -143,6 +149,16 @@ public abstract class PlayerController : MonoBehaviour
 				return coordinate;
 		}
 
+		public Tile GetCurrentTile ()
+		{
+				Collider2D[] colliders = Physics2D.OverlapCircleAll (new Vector2 (transform.position.x, transform.position.y), 0.1f);
+				foreach (Collider2D collider2D in colliders) {
+						Tile tile = collider2D.gameObject.GetComponent<Tile> ();
+						return tile;
+				}
+				return null;
+		}
+
 
 		void SetDirection ()
 		{
@@ -162,7 +178,10 @@ public abstract class PlayerController : MonoBehaviour
 				if (collide.gameObject.GetComponent<DeckTile> () == null) {
 						if (!isRespawn && !IsMe (collide)) {
 								if (collide is BoxCollider2D) {
-										ChangeDirection ();
+										StairsCollider castle = collide.gameObject.GetComponent<StairsCollider> ();
+										if (castle == null) {
+												ChangeDirection ();
+										}						
 										PlayerController collisionController = collide.gameObject.GetComponent<PlayerController> ();
 										if (collisionController != null) {
 												collisionController.ChangeDirection ();
@@ -214,23 +233,21 @@ public abstract class PlayerController : MonoBehaviour
 		
 		}
 
-		void MoveIntoBounds ()
+		void TotallyOutOfBounds ()
 		{
 				Vector3 myPosition = transform.position;
-				if (transform.position.x < minX) {
-						myPosition.x += 0.01f;
+				if (transform.position.x < (minX - 0.5f)) {
+						respawn ();
 				}
-				if (transform.position.x > maxX) {
-						myPosition.x -= 0.01f;
+				if (transform.position.x > (maxX + 0.5f)) {
+						respawn ();
 				}
-		
-				if (transform.position.y < minY) {
-						myPosition.y += 0.01f;
+				if (transform.position.y < (minY - 0.5f)) {
+						respawn ();
 				}
-				if (transform.position.y > maxY) {
-						myPosition.y -= 0.01f;
+				if (transform.position.y > (maxY + 0.5f)) {
+						respawn ();
 				}
-				transform.Translate (myPosition);
 		}
 
 		public abstract string GetName ();
@@ -420,9 +437,163 @@ public abstract class PlayerController : MonoBehaviour
 		void OnCollisionEnter2D (Collision2D collision)
 		{
 				PlayerController knight = collision.gameObject.GetComponent<PlayerController> ();
+				StairsCollider castle = collision.gameObject.GetComponent<StairsCollider> ();
 				if (knight != null) {
 						ChangeDirection ();
 						knight.ChangeDirection ();
 				}
+				if (castle != null) {
+						// do nothing
+				}
+				
 		}
+
+		void MaybeTurn ()
+		{
+				if (count > 6) {
+						Tile t = GetCurrentTile ();
+						if (t != null && t.type == Tile.TileType.TJunction) {
+								Turn (t);
+						}
+
+						if (t != null && t.type == Tile.TileType.Curve) {
+								TurnCurve (t);
+						}
+						count = 0;
+				}
+				count++;
+
+		}
+
+		void TurnCurve (Tile t)
+		{
+				int rotation = Mathf.FloorToInt (t.gameObject.transform.rotation.eulerAngles.z);
+				if (isCenterHoriz (t) && direction == RIGHT) {
+						if (rotation == 180) {
+								TurnRight ();
+						}
+						if (rotation == 90) {
+								TurnLeft ();
+						}
+				
+				}
+			
+				if (isCenterHoriz (t) && direction == LEFT) {
+						if (rotation == 0) {
+								TurnRight ();
+						}
+						if (rotation == 270) {
+								TurnLeft ();
+						}
+				}
+			
+				if (isCenterVert (t) && direction == UP) {
+						if (rotation == 270) {
+								TurnRight ();
+						}
+						if (rotation == 180) {
+								TurnLeft ();
+						}
+				}
+			
+				if (isCenterVert (t) && direction == DOWN) {
+						if (rotation == 0) {
+								TurnLeft ();
+						}
+						if (rotation == 90) {
+								TurnRight ();
+						}
+				
+				}
+		}
+
+		void Turn (Tile t)
+		{
+				int rotation = Mathf.FloorToInt (t.gameObject.transform.rotation.eulerAngles.z);
+				if (isCenterHoriz (t) && direction == RIGHT) {
+
+						if (rotation == 90) {
+								LeftOrStraight ();
+						}
+						if (rotation == 180) {
+								RightOrLeft ();
+						}
+						if (rotation == 270) {
+								RightOrStraight ();
+						}
+				}
+		
+				if (isCenterHoriz (t) && direction == LEFT) {
+						if (rotation == 0) {
+								RightOrLeft ();
+						}
+						if (rotation == 90) {
+								RightOrStraight ();
+						}
+						if (rotation == 270) {
+								LeftOrStraight ();
+						}
+				}
+		
+				if (isCenterVert (t) && direction == PlayerController.UP) {
+						if (rotation == 0) {
+								RightOrStraight ();
+						}
+						if (rotation == 180) {
+								LeftOrStraight ();
+						}
+						if (rotation == 270) {
+								RightOrLeft ();
+						}
+				}
+		
+				if (isCenterVert (t) && direction == PlayerController.DOWN) {
+						if (rotation == 0) {
+								LeftOrStraight ();
+						}
+						if (rotation == 90) {
+								RightOrLeft ();
+						}
+						if (rotation == 180) {
+								RightOrStraight ();
+						}
+			
+				}
+		}
+	
+		private void RightOrLeft ()
+		{
+				if (Random.value > 0.5f) {
+						TurnRight ();
+				} else {
+						TurnLeft ();
+				}
+				
+		}
+	
+		private void RightOrStraight ()
+		{
+				if (Random.value > 0.5f) {
+						TurnRight ();
+				}
+		}
+	
+		private void LeftOrStraight ()
+		{
+				if (Random.value > 0.5f) {
+						TurnLeft ();
+				}
+		
+		}
+
+		private bool isCenterHoriz (Tile t)
+		{
+				return Mathf.Abs (this.transform.localPosition.x - t.transform.localPosition.x) < 0.03;
+		}
+
+		private bool isCenterVert (Tile t)
+		{
+				return Mathf.Abs (this.transform.localPosition.y - (t.transform.localPosition.y + 0.2f)) < 0.03;
+		}
+
 }

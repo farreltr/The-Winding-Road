@@ -27,7 +27,7 @@ public class StairsCollider : MonoBehaviour
 								} else if (myName == playerController.GetRespawnCastle () && playerController.isRespawn) {
 										//do nothing
 								} else {
-										playerController.ChangeDirection ();
+										//playerController.ChangeDirection ();
 								}
 						}
 

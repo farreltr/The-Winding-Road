@@ -58,7 +58,7 @@ public class GreenController : PlayerController
 						}
 				case Tile.TileType.TJunction:
 						{
-								if (!isEqual (rotation, ONE_EIGHTY)) {
+								if (!isEqual (rotation, ZERO)) {
 										return true;
 								}
 								break;

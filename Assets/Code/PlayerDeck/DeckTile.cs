@@ -17,6 +17,9 @@ public class DeckTile : MonoBehaviour
 		private int slotIndex;
 		private Transform child;
 		public bool disabled = false;
+		private bool cpuMoving = false;
+		private Vector3 endLocation;
+		private float duration = 8f;
 	
 		void Start ()
 		{
@@ -34,6 +37,11 @@ public class DeckTile : MonoBehaviour
 	
 		void OnMouseDrag ()
 		{
+				doMouseDrag ();
+		}
+
+		void doMouseDrag ()
+		{
 				if (draggable && !disabled) {
 						Vector3 curScreenPoint = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
 						Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
@@ -45,7 +53,14 @@ public class DeckTile : MonoBehaviour
 
 		void OnMouseUp ()
 		{
+				doMouseUp ();
+
+		}
+
+		void doMouseUp ()
+		{
 				if (!disabled) {
+						GetComponent<SpriteRenderer> ().sortingLayerName = "Deck Tile";
 						gameObject.transform.localScale = Vector3.one / 2f;
 						float radius = this.transform.localScale.x / 2;
 						Vector2 point = new Vector2 ();
@@ -71,20 +86,25 @@ public class DeckTile : MonoBehaviour
 						if (!IsHit ()) {
 								gameObject.transform.position = slotPosition;
 						}
-
+			
 				}
-
 		}
 
 
 		void OnMouseDown ()
 		{
+				doMouseDown ();
+		}  
+
+		void doMouseDown ()
+		{
 				if (draggable && !disabled) {
 						parent.SetSelected (this);
+						GetComponent<SpriteRenderer> ().sortingLayerName = "Top Layer";
 						screenPoint = Camera.main.WorldToScreenPoint (gameObject.transform.position);			
 						offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
 				}
-		}  
+		}
 
 		public Vector3 GetSlotPosition ()
 		{
@@ -174,6 +194,40 @@ public class DeckTile : MonoBehaviour
 				}
 
 				return dt;
+		}
+
+		public void MoveToRandomLocation ()
+		{
+				cpuMoving = true;
+				Arrow[] arrows = GameObject.FindObjectsOfType<Arrow> ();
+				endLocation = arrows [Random.Range (0, arrows.Length)].transform.position;
+				if (draggable && !disabled) {
+						parent.SetSelected (this);
+						GetComponent<SpriteRenderer> ().sortingLayerName = "Top Layer";
+				}
+				// doMouseDown ();
+				// get random location
+				// set move to 
+				// on arrival set release
+		}
+
+		void Update ()
+		{
+				if (cpuMoving && !Mathf.Approximately (gameObject.transform.position.magnitude, endLocation.magnitude)) {
+						if (draggable && !disabled) {
+								SetDragging (true);
+								gameObject.transform.localScale = Vector3.one / 2f * 1.1f;
+						}
+						MoveTile ();
+				} else if (cpuMoving && Mathf.Approximately (gameObject.transform.position.magnitude, endLocation.magnitude)) {
+						cpuMoving = false;
+						doMouseUp ();
+				}
+		}
+
+		void MoveTile ()
+		{
+				gameObject.transform.position = Vector3.Lerp (gameObject.transform.position, endLocation, 1 / (duration * (Vector3.Distance (gameObject.transform.position, endLocation))));
 		}
 
 }

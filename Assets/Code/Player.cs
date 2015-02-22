@@ -58,13 +58,13 @@ public class Player : IComparable
 		public static Colour GetPlayerColour (string colour)
 		{
 				switch (colour) {
-				case "RED":
+				case "red":
 						return Colour.RED;
-				case "BLUE":
+				case "blue":
 						return Colour.BLUE;
-				case "GREEN":
+				case "green":
 						return Colour.GREEN;
-				case "YELLOW":
+				case "yellow":
 						return Colour.YELLOW;
 				}
 				return Colour.RED;

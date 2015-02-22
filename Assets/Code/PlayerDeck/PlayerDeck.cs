@@ -14,6 +14,7 @@ public class PlayerDeck : MonoBehaviour
 				new Vector2 (6.85f, -0.45f)
 		};
 		public Transform rotateButton;
+		public Transform slot;
 
 		void Start ()
 		{
@@ -47,6 +48,7 @@ public class PlayerDeck : MonoBehaviour
 						}
 							
 				}
+				AddSlots ();
 				AddRotateButtons ();
 		}
 
@@ -61,6 +63,7 @@ public class PlayerDeck : MonoBehaviour
 						GameObject slot = Instantiate (randomTile) as GameObject;
 						PutTileInSlot (slot, i);	
 				}
+				AddSlots ();
 				AddRotateButtons ();
 
 		}
@@ -87,6 +90,16 @@ public class PlayerDeck : MonoBehaviour
 				deckTile.GetComponent<Tile> ().slotIndex = i;
 				slots [i] = deckTile;
 				slots [i].transform.parent = this.gameObject.transform;
+		}
+
+		void AddSlots ()
+		{
+				for (int i=0; i< numberOfSlots; i++) {
+						//Vector3 slotPosition = new Vector3 (slotPosition [i].x, slotPosition [i].y, 0.0f);
+						Transform s = Instantiate (slot, slotPosition [i], slot.rotation) as Transform;
+						s.transform.parent = this.transform;
+				}
+		
 		}
 
 		void AddRotateButtons ()
@@ -131,5 +144,10 @@ public class PlayerDeck : MonoBehaviour
 								dt.disabled = disabled;
 						}
 				}
+		}
+
+		public DeckTile GetRandomDeckTile ()
+		{
+				return slots [Random.Range (0, 3)];
 		}
 }

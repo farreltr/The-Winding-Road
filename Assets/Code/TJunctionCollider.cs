@@ -4,6 +4,9 @@ using System.Collections;
 public class TJunctionCollider : MonoBehaviour
 {
 
+		private bool turn = false;
+		private bool collide = true;
+
 		private enum Direction
 		{
 				RIGHT,
@@ -14,72 +17,113 @@ public class TJunctionCollider : MonoBehaviour
 		// Use this for initialization
 		void Start ()
 		{
-	
-		}
-	
-		// Update is called once per frame
-		void Update ()
-		{
-	
+				Random.seed = Mathf.FloorToInt (Time.time);
 		}
 
-		void OnTriggerEnter2D (Collider2D collider)
+		void OnCollisionEnter2D (Collision2D collision)
 		{
-				PlayerController playerController = collider.transform.GetComponent<PlayerController> ();
-				if (playerController != null) {			
+				PlayerController playerController = collision.collider.collider2D.transform.GetComponent<PlayerController> ();
+				if (playerController != null && !playerController.isRespawn && collide) {			
 						int rotation = Mathf.RoundToInt (this.transform.eulerAngles.z);
 						Direction direction = getTurningDirection (playerController, rotation);
 						if (direction.Equals (Direction.RIGHT)) {
+								turn = !turn;
 								playerController.TurnRight ();
 						} else if (direction.Equals (Direction.LEFT)) {
+								turn = !turn;
 								playerController.TurnLeft ();
-					
+						} else {
+								collide = false;
 						}
 				}
+		}
+
+		void OnCollisionStay2D (Collision2D collision)
+		{
+				print ("colliding");
+		}
+
+		void OnCollisionExit2D (Collision2D collision)
+		{
+				collide = true;
 		}
 
 		Direction getTurningDirection (PlayerController playerController, int rotation)
 		{
 				Vector2 direction = playerController.direction;
 				if (direction == PlayerController.RIGHT) {
-						if (rotation == 180) {
-								return Direction.RIGHT;
-						}
 						if (rotation == 90) {
-								return Direction.LEFT;
+								return LeftOrStraight ();
 						}
-
+						if (rotation == 180) {
+								return RightOrLeft ();
+						}
+						if (rotation == 270) {
+								return RightOrStraight ();
+						}
 				}
 
 				if (direction == PlayerController.LEFT) {
 						if (rotation == 0) {
-								return Direction.RIGHT;
+								return RightOrLeft ();
+						}
+						if (rotation == 90) {
+								return RightOrStraight ();
 						}
 						if (rotation == 270) {
-								return Direction.LEFT;
+								return LeftOrStraight ();
 						}
-			
 				}
 
 				if (direction == PlayerController.UP) {
-						if (rotation == 270) {
-								return Direction.RIGHT;
+						if (rotation == 0) {
+								return RightOrStraight ();
 						}
 						if (rotation == 180) {
-								return Direction.LEFT;
+								return LeftOrStraight ();
 						}
-			
+						if (rotation == 270) {
+								return RightOrLeft ();
+						}
 				}
 
 				if (direction == PlayerController.DOWN) {
 						if (rotation == 0) {
-								return Direction.LEFT;
+								return LeftOrStraight ();
 						}
 						if (rotation == 90) {
-								return Direction.RIGHT;
+								return RightOrLeft ();
+						}
+						if (rotation == 180) {
+								return RightOrStraight ();
 						}
 			
 				}
 				return Direction.STRAIGHT;
+		}
+
+		private Direction RightOrLeft ()
+		{
+				if (turn) {
+						return Direction.RIGHT;
+				}
+				return Direction.LEFT;
+		}
+
+		private Direction RightOrStraight ()
+		{
+				if (turn) {
+						return Direction.RIGHT;
+				}
+				return Direction.STRAIGHT;
+		}
+
+		private Direction LeftOrStraight ()
+		{
+				if (turn) {
+						return Direction.LEFT;
+				}
+				return Direction.STRAIGHT;
+		
 		}
 }

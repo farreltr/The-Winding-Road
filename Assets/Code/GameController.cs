@@ -24,6 +24,8 @@ public class GameController : MonoBehaviour
 		private DeckTile draggingTile;
 		private Tile endTile;
 		private int draggingTileIndex;
+		private PlayerManager playerManager;
+		private bool processCPU = false;
 
 		void Start ()
 		{
@@ -31,12 +33,33 @@ public class GameController : MonoBehaviour
 				gameOver = false;
 				restart = false;
 				deck = GameObject.FindObjectOfType<PlayerDeck> ();
+				playerManager = GameObject.FindObjectOfType<PlayerManager> ();
+				processCPU = playerManager.isCurrentPlayerCPU ();
 
 		}
 	
 		void Update ()
 		{
 
+				if (processCPU) {
+						// set "isCPU" icon beside player portrait
+						processCPU = false;
+						deck = GameObject.FindObjectOfType<PlayerDeck> ();
+						DeckTile[] dts = GameObject.FindObjectsOfType<DeckTile> ();
+						DeckTile dt = dts [Random.Range (0, dts.Length)];
+						if (dt != null) {
+								dt.MoveToRandomLocation ();
+
+						}
+						
+						// choose tile from hand
+						// rotate?
+						// choose input slot
+						// move to slot
+						// do as below
+
+
+				} 
 				if (isDragging && draggingTile.IsHit ()) {
 						draggingTile.transform.parent = GameObject.FindObjectOfType<Board> ().transform;
 						draggingTile.gameObject.GetComponent<Tile> ().coordinate = new Vector2 (currentCoordinateX - 1, currentCoordinateY - 1);
@@ -69,10 +92,31 @@ public class GameController : MonoBehaviour
 		private bool HandleTile ()
 		{
 				BlockUserInput ();
+				//SetPlayerParents ();
 				ShiftBoardTiles ();
+				//ResetPlayerParents ();
 				ShiftPlayers ();
 				EndTileMove ();
 				return true;
+		}
+
+		void SetPlayerParents ()
+		{
+				PlayerController[] knights = GameController.FindObjectsOfType<PlayerController> ();
+				foreach (PlayerController k in knights) {
+						k.transform.parent = k.GetCurrentTile ().gameObject.transform;
+
+				}
+		}
+
+		void ResetPlayerParents ()
+		{
+				PlayerController[] knights = GameController.FindObjectsOfType<PlayerController> ();
+				foreach (PlayerController k in knights) {
+						k.transform.parent = k.defaultParent;
+			
+				}
+
 		}
 
 		void BlockUserInput ()
@@ -368,6 +412,11 @@ public class GameController : MonoBehaviour
 						restart = true;
 				}
 
+		}
+
+		public void OnLevelWasLoaded (int i)
+		{
+				processCPU = playerManager.isCurrentPlayerCPU ();
 		}
 
 		public enum TilePosition

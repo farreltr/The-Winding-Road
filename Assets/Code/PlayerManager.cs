@@ -12,7 +12,7 @@ public class PlayerManager : MonoBehaviour
 		int widthRed = Screen.width / 2 + 270;
 		int distance = 220;
 		public GUISkin skin;
-		private List<Player> players = new List<Player> ();
+		private Player[] players = new Player[4];
 		private List<int> list = new List<int> ();
 		public static Player currentPlayer;
 		public int currentPlayerIdx = 0;
@@ -46,7 +46,7 @@ public class PlayerManager : MonoBehaviour
 		void Start ()
 		{
 				Screen.orientation = ScreenOrientation.Landscape;
-				UnityEngine.Random.seed = Mathf.FloorToInt (Time.time);
+				UnityEngine.Random.seed = (int)DateTime.Now.Ticks;
 				DontDestroyOnLoad (gameObject);
 				for (int i=0; i<4; i++) {
 						list.Add (i);
@@ -61,12 +61,16 @@ public class PlayerManager : MonoBehaviour
 				bluePlayerName = "CPU";
 				greenPlayerName = "CPU";
 				yellowPlayerName = "CPU";
-				players = new List<Player> ();
 				for (int i=0; i<4; i++) {
 						list.Add (i);
 				}
-				SetUpTurnOrder ();
+				GameObject[] cpuIndicators = GameObject.FindGameObjectsWithTag ("CPU Indicator");
+				foreach (GameObject cpui in cpuIndicators) {
+						cpui.gameObject.GetComponent<SpriteRenderer> ().enabled = false;
+			
+				}
 				AddAllPlayersAsInactive ();
+				SetUpTurnOrder ();
 		
 		}
 	
@@ -125,13 +129,22 @@ public class PlayerManager : MonoBehaviour
 
 		public void AddActivePlayer (Player.Colour colour)
 		{
-				players.Add (new Player (colour, GetTurn (colour), false));
+				foreach (Player p in players) {
+						if (p.getPlayerColour ().Equals (colour)) {
+								p.isCPU = false;
+						}
+				}
 
 		}
 
 		public void RemoveActivePlayer (Player.Colour colour)
 		{
-				players.Add (new Player (colour, GetTurn (colour), true));
+				foreach (Player p in players) {
+						if (p.getPlayerColour ().Equals (colour)) {
+								p.isCPU = true;
+						}
+				}
+
 		}
 
 		int GetNextTurn (int prev)
@@ -146,22 +159,38 @@ public class PlayerManager : MonoBehaviour
 		public void StartGame ()
 		{
 				showCharSelect = false;
-				if (players.ToArray ().Length == 0) {
+				if (players.Length == 0) {
 						AddAllPlayersAsInactive ();
 						currentPlayerIdx = UnityEngine.Random.Range (0, 4);
 				}
-				players.Sort ();
 				currentPlayer = players [currentPlayerIdx];
 				SetUpPlayerPrefs ();
 				Application.LoadLevel (currentPlayer.getPlayerColour ().ToString ());
-				//UpdatePortraits ();
+				GameObject[] cpuIndicators = GameObject.FindGameObjectsWithTag ("CPU Indicator");
+				foreach (GameObject cpui in cpuIndicators) {
+						foreach (Player p in playerManager.GetCPUPlayers()) {
+								if (p.isPLayerCPU () && cpui.name == p.getPlayerColour ().ToString ().ToLower ()) {
+										cpui.gameObject.GetComponent<SpriteRenderer> ().enabled = true;
+								}
+						}
+			
+				}
+		}
+
+		void Sort ()
+		{
+				Player[] sortedPlayers = new Player[4];
+				foreach (Player p in players) {
+						sortedPlayers [p.getPlayerTurn ()] = p;
+				}
+				this.players = sortedPlayers;
 		}
 
 		public void LoadNextLevel ()
 		{
 				SaveLevel ();
 				currentPlayerIdx++;
-				if (currentPlayerIdx == players.Count) {
+				if (currentPlayerIdx == players.Length) {
 						currentPlayerIdx = 0;
 				}
 				currentPlayer = players [currentPlayerIdx];	
@@ -340,7 +369,7 @@ public class PlayerManager : MonoBehaviour
 				blue = UnityEngine.Random.Range (0, 4);
 				red = GetNextTurn (blue);
 				yellow = GetNextTurn (red);
-				green = GetNextTurn (green);
+				green = GetNextTurn (yellow);
 		}
 
 		private int GetTurn (Player.Colour colour)
@@ -360,8 +389,26 @@ public class PlayerManager : MonoBehaviour
 
 		void AddAllPlayersAsInactive ()
 		{
+				int i = 0;
+				players = new Player[4];
 				foreach (Player.Colour colour in Player.GetColours()) {
-						RemoveActivePlayer (colour);
+						players [i] = new Player (colour, GetTurn (colour), true);
+						i++;
 				}
+				Sort ();
+		}
+
+		public bool isCurrentPlayerCPU ()
+		{
+				return currentPlayer.isPLayerCPU ();
+		}
+
+		public Player[] GetCPUPlayers ()
+		{
+				List<Player> playerList = new List<Player> ();
+				foreach (Player p in players) {
+						playerList.Add (p);
+				}
+				return playerList.ToArray ();
 		}
 }
